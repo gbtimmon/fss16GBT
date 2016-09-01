@@ -1,8 +1,8 @@
-##i Reference
+##1 Reference
     
 F. Khomh, T. Dhaliwal, Y. Zou and B. Adams. 2012.Do Faster Releases Improve Software Quality?: An Empirical Case Study of Mozilla Firefox.Proceedings of the 9th IEEE Working Conference on Mining Software Repositories. IEEE Press, 2012.
 
-##ii Keywords
+##2 Keywords
 ii1 Release Cycle - the rate at which updates to software are pushed out to the consumer
 
 ii2 Rapid Release - A methodology of keeping releases small and pushing them often in the hopes that this will imporve the release quality.
@@ -11,7 +11,7 @@ ii3 Post Release Bugs - Bugs reported by users after the release of an update. T
 
 ii4 Uptime - The overall time that an application is available on average between crashes
 
-##iii Long Form Summary
+##3 Summary
 
 ii1 Introduction 
 
