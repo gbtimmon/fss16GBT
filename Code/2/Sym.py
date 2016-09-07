@@ -1,8 +1,11 @@
 from collections import defaultdict
+from collections import OrderedDict
+
 class Sym():
 
   def __init__(self, attr_name=None):
      self.counts = defaultdict(int)
+     self.uniq   = {}
      self.most   = 0
      self.mode   = None
      self.n      = 0
@@ -10,6 +13,9 @@ class Sym():
   def add(self, x):
     self.n += 1
     self.counts[x] = self.counts[x] + 1
+
+    if x not in self.uniq : self.uniq[x] = len(self.uniq) + 1
+        
     
     if self.counts[x] > self.most:
       self.most = self.counts[x]
