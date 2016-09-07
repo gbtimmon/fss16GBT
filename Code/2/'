@@ -1,0 +1,38 @@
+#!python
+
+__author__='greg timmons'
+
+import sys 
+
+class Attr() : 
+    def __init__( self, name, atype ) : 
+        self.name = name
+       
+
+def main( ) :
+
+   attr_count = 0
+
+   # load all of lines that are none empty
+   inf = [ x for x in map( str.strip, sys.stdin ) if len(x) > 0]
+         
+   inData = False
+   for l in inf :
+      if ( inData ) :
+         if( l[0] == "@" ) :
+            inData = False
+         else :
+            print l
+          
+      else :
+         if( l[0:5] == "@data") :
+            inData = True
+   
+
+
+         
+       
+
+
+if __name__ == '__main__' : 
+   main()
