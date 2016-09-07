@@ -12,6 +12,19 @@ def eprint(*args, **kwargs):
 def repString( sym, x ) :
    return  str(sym.uniq[x]) + ":" + str(x)  
 
+def loadFile( ff ) :
+
+   # 1.) load all of lines that are non empty
+   # 2.)load all of the attributes. 
+   # 3.)grab all the none @ lines, these should be data. 
+
+   inf = [ x for x in map( str.strip, open(ff, "r").readlines() ) if len(x) > 0]
+   atr = [ x[11:].split(" ", 1) for x in inf if x[0:10] == "@attribute" ]
+   dat = [ x.split(",") for x in inf if x[0] != "@" ]
+ 
+   return atr, dat
+
+
 def main( ) :
 
    trainFile = ""
@@ -33,17 +46,9 @@ def main( ) :
    attr_count = 0
    pred = Sym()
    
-   # 1.) load all of lines that are non empty
-   # 2.)load all of the attributes. 
-   # 3.)grab all the none @ lines, these should be data. 
-   
-   train_inf = [ x for x in map( str.strip, open(trainFile, "r").readlines() ) if len(x) > 0]
-   train_atr = [ x[11:].split(" ", 1) for x in train_inf if x[0:10] == "@attribute" ]
-   train_dat = [ x.split(",") for x in train_inf if x[0] != "@" ]
+   train_atr, train_dat = loadFile( trainFile )  
+   test_atr, test_dat   = loadFile( testFile )  
   
-   test_inf = [ x for x in map( str.strip, open(testFile, "r").readlines() ) if len(x) > 0]
-   test_atr = [ x[11:].split(" ", 1) for x in test_inf if x[0:10] == "@attribute" ]
-   test_dat = [ x.split(",") for x in test_inf if x[0] != "@" ]
 
    # Generate a symbol class for the prediction attribute so that we can find the mode
    # and assign it as the prediction. 

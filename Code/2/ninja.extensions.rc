@@ -1,8 +1,17 @@
+#!/bin/bash
+called=$_
+if [[ $called != $0 ]]; then
+    EXT_PATH=`dirname ${BASH_SOURCE[@]}`
+else
+    echo "Please source this script"
+    exit 1
+fi
+
 zeroR() {
-    ./
+    python $EXT_PATH/zeroR.py $1 $2
 }
 
-eg10() {
+eg11() {
     local data="data/jedit-4.1.arff"               # edit this line to change the data
     local learners="j48 jrip nb rbfnet bnet zeroR" # edit this line to change the leaners
     local goal=true                                # edit this line to hunt for another goal
@@ -15,6 +24,6 @@ eg10() {
         crossval 5 5 "$data" $Seed $learners | grep $goal >"$i"
         gawk  '{print $2,$10}' "$i" > "$i.pd"
         gawk  '{print $2,$11}' "$i" > "$i.pf"
-        eg10
+        eg11
    fi
 }
