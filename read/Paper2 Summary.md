@@ -12,5 +12,13 @@ http://www.inf.ufes.br/~monalessa/PaginaMonalessa-NEMO/ES_Mestrado/Artigos/Model
 * Incremental:A method of software development where the model is designed, implemented and tested incrementally, till the product is finished.
 
 ##Summary
+###Introduction
+This paper lists three categories of considerations to be made while choosing a particular SDLC model. A number of models including Waterfall, incremental and RAD are discuused.
+
+* Category 1. Software that provides back-end functionality.Typically, this is software that provides a service toother applications.
+* Category 2. Software that provides a service to an end-user or to an end-user application. Typically, this would be software that encapsulates business logic or formats data to make it more understandable to an end-user.
+* Category 3. Software that provides a visual interface to an enduser. Typically, this is a front-end application that is a graphical user interface (GUI)
+
+
 
 
