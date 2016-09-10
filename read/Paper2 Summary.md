@@ -28,14 +28,23 @@ It also states that SDLC can be of three types: iterative, linear or a combinati
 * Spiral : Solves issues in Waterfall model- two design stages are unnecessary, top down approach along with look-ahead approach, identification of risks and issues. Advantage- control risks and costs. Best suited to Category 1 but can be modified for all categories. Disadvantage- requires flexible project and relies on designer's risk analysis.
 * Unified Process Model: Model(or architechture) based and use-case driven. Developed for OOPs. Suitable for Category 2 and 3 projects. Not ideal for large systems.
 * RAD: Rapid Application Development. It is a way to deliver projects faster and iteratively. Promotes a collaborative atmosphere where business stakeholders participate actively in prototyping, creating test cases and performing unit tests. RAD is now used as a generic term for a number of techniques ofr speeding the software development.
-1. Agile: Projects are divided into sub-projects to avoid issues with changes. Short interval development to small incremental changes. Applying Agile to large projects can be problematic because it emphasizes real-time communication. Most suited to Category 3.
-2. Extreme Programming (XP): Development takes place incrementally and fast with a business champion acting as a conduit for user-driven requirements and functionality. Costs may be higher, if new requirement changes are done. 
-3. Lean Development (LD): Deliver projects early with minimal functionality
-4. Scrum: Development takes place over a series of short iterations, or sprints, and progress is measured daily. Scrum is more suited to small projects.
+
+i) Agile: Projects are divided into sub-projects to avoid issues with changes. Short interval development to small incremental changes. Applying Agile to large projects can be problematic because it emphasizes real-time communication. Most suited to Category 3.
+
+ii) Extreme Programming (XP): Development takes place incrementally and fast with a business champion acting as a conduit for user-driven requirements and functionality. Costs may be higher, if new requirement changes are done. 
+
+iii) Lean Development (LD): Deliver projects early with minimal functionality.
+
+iv) Scrum: Development takes place over a series of short iterations, or sprints, and progress is measured daily. Scrum is more suited to small projects.
+
 All RAD techniques are well suited to category 3 but not to Category 1 and 2 due to lack of a formal procedural approach.
 
 ### Conclusion and Future
+SDLC can evolve and borrow from other spheres such as behavior analysis, time management, and business management. Agile is based on behavior analysis. Suggestions are made for a central repository of SDLC models which can help project development in a number of ways. 
 
+This paper introduces Rapid Application Development, a few methodologies and comparisons to traditional models. The advantages in temrs of speed and change requirement handling is explained. It forms the basis for how and when to choose such models and when to avoid them for various reasons.
+
+Improvements: There could be more of a comparison between models, based on metrics, or a clearer list of advantages and disadvantages.
 
 
 
