@@ -29,3 +29,10 @@ In relation to the first question of weather the change in developement model af
 In relation to the second question of weather the change in development model affects the length of bux fixes : The paper found in a rapid release model the number of bugs fix ed during the testing period we significantly loer than in the traditional model. Bugs are fixed faster under a rapid release model.
 
 In relation to the final question of weather the release model affect the adoption of software updates. The paper found in a rapid release model, users switch fast to newer versions then in the traditional model (New version of FF had auto update and update reminders that did not exist, this doesnt seem to be corrected for). 
+
+##4.)Improvements
+
+i.) The paper only observes one project which is a very small sample size, more examples would be better. 
+
+ii.) The paper only give cursory explinations of how the data it gathered, we cant be sure that the data gathers is of high quality based of what is presented, calling the results into some degree of question. 
+
