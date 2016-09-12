@@ -1,7 +1,12 @@
-#!python
-import CVS_reader.py
 
-class Table() : 
-   pass
-  
+class Table():
+  def __init__():
+    pass
+ 
+  def __repr__():
+    pass
+
+
+
+
 
