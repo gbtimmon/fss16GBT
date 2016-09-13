@@ -1,4 +1,5 @@
 import FileReader
+import math
 
 class Table:
   def __init__( self, fileName ) : 
@@ -23,7 +24,7 @@ class Header:
   def __str__(self) :
     
     return (
-      ("%20s | %-5s  %-20s  %-5s  %-5s  %-5s  %-5s  %-5s\n" % ( "NAME", "M-CNT", "MODE", "MU", "M2", "SD", "MIN", "MAX"))
+      ("%20s | %-5s  %-5s  %-20s  %-10s  %-10s  %-10s  %-10s  %-10s\n" % ( "NAME", "ETRPY", "M-CNT", "MODE", "MU", "M2", "SD", "MIN", "MAX"))
       + (" "*5 +"-" * 16 + "+" + ("-"*75) + "\n")
       + "".join( [ str(x) for x in self.obj ])
     )
@@ -61,9 +62,9 @@ class Num:
 
   def rowStr( self ) :
     if( self.invalid ) :
-      return (("%5s  %5s  %5s  %5s  %5s") % ( "n/a", "n/a","n/a","n/a","n/a" ))
+      return (("%10s  %10s  %10s  %10s  %10s") % ( "-", "-","-","-","-" ))
     else :
-      return (("%5s  %5s  %5s  %5s  %5s") % ( str(self.mu),  str(self.m2), str(self.sd()), str(self.min), str(self.max)))
+      return (("%10.4f  %10.4f  %10.4f  %10.4f  %10.4f") % ( self.mu,  self.m2, self.sd(), self.min, self.max))
 
   def __init__( self ) :
     self.mu      = 0
@@ -111,40 +112,22 @@ from collections import OrderedDict
 class Sym():
 
   def rowStr( self ) :
-    return (("%5s  %-20s") % ( str(self.most),  str(self.mode)))
+    return (("%5.4f  %5s  %-20s") % ( self.ent(), str(self.most),  str(self.mode)))
 
   def __init__( self ):
-     self.counts = defaultdict(int)
-     self.uniq   = {}
-     self.most   = 0
-     self.mode   = None
-     self.n      = 0
+     self.counts, self.most, self.mode, self.n = {},0,None,0
 
-  def add(self, x):
-    self.n += 1
-    self.counts[x] = self.counts[x] + 1
-
-    if x not in self.uniq : self.uniq[x] = len(self.uniq) + 1
-        
-    
-    if self.counts[x] > self.most:
-      self.most = self.counts[x]
-      self.mode = x
-
+  def add(i,x):
+    i.n += 1
+    new = i.counts[x] = i.counts.get(x,0) + 1
+    if new > i.most:
+      i.most, i.mode = new,x
     return x
 
-  def sub( self, x ):
-    self.n -= 1
-    self.counts[x] -= 1
-
-    if x == self.mode:
-      "wut?"
-      self.most, self.mode = None,None
-
-  def ent(i):
+  def ent(self):
     tmp = 0
     for val in self.counts.values():
-      p = val/self.n
+      p = float(val)/float(self.n)
       if p:
         tmp -= p*math.log(p,2)
     return tmp  
