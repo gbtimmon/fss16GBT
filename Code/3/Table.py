@@ -1,12 +1,21 @@
 import FileReader
 import math
+import sys
+import re
+
+sys.dont_write_bytecode = True
 
 class Table:
-  def __init__( self, fileName ) : 
-    self.filename = fileName
+
+  def __len__( self ) :
+    return self.rowCount
+
+  def __init__( self, **kwargs ) : 
+
+    self.filename = kwargs["fileName"]
     self.rowCount = 0
 
-    reader = FileReader.factory( fileName )
+    reader = FileReader.factory( kwargs )
 
     self.header = Header(reader.next())
     self.data   = []
@@ -14,12 +23,57 @@ class Table:
       self.rowCount += 1
       self.header.update(x)
       self.data.append(x)
-      
+
+  def __getitem__( self, tup) :
+
+    i,j = tup
+
+    if( i == -1 ) : 
+      if( j == None ) : return self.header
+      return self.header[j]
+
+    if( j == None ) : return self.data[i]
+    return self.data[i][j]
+  
+  def dist( self, a, b, f=2 ) :
+    d = 0
+    n = len( self.header )
+    s = 0
+
+    if( n == 0 ) : return None
+
+    for col in xrange(n):
+       hd = self.header[ col ]
+       v1 = self[ a, col ]
+       v2 = self[ b, col ]
+     
+       if( v1 is None and v2 is None ): continue
+       if( v1 is None ) : v1 = hd.furthest(v2)
+       if( v2 is None ) : v2 = hd.furthest(v1)
+       s += hd.dist( v1, v2) ** f
+
+    return (( float(s) ** (1.0/float(f)))/(float(n)**(1.0/float(f))))
+
   def __str__(self) :
      return "\n     File Name :" + str(self.filename) + "\n     Row Count : " + str(self.rowCount) + "\n\n" + str(self.header)
 
-     
+
+"""
+  Header class
+
+  Stores a set of meta data for the table. 
+  Each column is a _Header object
+    each _header object contains a Sym and Num object to store requisite metadata. 
+    If any non-num value is recieved then the Num object is deactivate since there is a non-num value
+
+"""     
 class Header:
+
+  def __getitem__(self, i):
+    return self.obj[i]
+
+  def __len__(self) : 
+    return len(self.obj)
 
   def __str__(self) :
     
@@ -30,6 +84,8 @@ class Header:
     )
     
   def __init__( self, cols ) : 
+    
+    cols = map( lambda x: re.sub("[^a-zA-Z0-9_ ]","",x), cols )
     self.rowCount = 0
     self.obj = [ _Header(x) for x in cols ]
 
@@ -57,7 +113,22 @@ class _Header:
            ( "%20s | %s %s\n" % ( str(self.name), self.symbol.rowStr(), self.number.rowStr() ))
     )
 
+  def norm( self, x ) :
+    return self.symbol.norm(x) if ( self.number.invalid ) else self.number.norm(x) 
+
+  def dist( self, x, y):
+    return self.symbol.dist(x,y) if ( self.number.invalid ) else self.number.dist(x,y) 
+
+  def furthest( self, x ) : 
+    return self.symbol.furthest(x) if ( self.number.invalid ) else self.number.furthest(x) 
+
      
+"""
+   Num Class
+
+   Stores the number metadata. 
+
+"""
 class Num:
 
   def rowStr( self ) :
@@ -93,22 +164,30 @@ class Num:
     self.m2  += delta*(x - self.mu)
     return x 
 
-  def sub(i,x): 
+  def norm( self, x ) :
+    denom = self.max - self.min
+    if( denom == 0 ) : return 0
 
-    "No check for item existence here might be a problem"
-    "add(7) add(7) add(7) sub(4) -- what would my data even mean??"
+    norm = x - self.min / denom
+    return max( min ( norm, 1), 0 )
 
-    self.n   = max(0, self.n - 1)
-    delta = x - self.mu
-    self.mu  = max(0,self.mu - delta/self.n)
-    self.m2  = max(0,self.m2 - delta*(x - self.mu))
+    
+  def dist( self, a, b ) : 
+    return abs(self.norm(b) - self.norm(a))
+
+  def furthest ( self, x ) :
+    return self.max if x <(self.max-self.min)/2 else self.min
 
   def sd( self ):
     return 0 if self.n <= 2 else (self.m2/(self.n - 1))**0.5
 
-from collections import defaultdict
-from collections import OrderedDict
 
+"""
+    Sym Class
+
+    Stores the symbols metadata. 
+
+"""
 class Sym():
 
   def rowStr( self ) :
@@ -124,6 +203,10 @@ class Sym():
       i.most, i.mode = new,x
     return x
 
+  def norm( self, x )     : return x
+  def dist( self, x, y)   : return 0 if x == y else 1
+  def furthest( self, x ) : return None
+
   def ent(self):
     tmp = 0
     for val in self.counts.values():
@@ -134,4 +217,8 @@ class Sym():
 
 if __name__ == '__main__' : 
   import sys
-  print Table(sys.argv[1] )
+  tab = Table(fileName=sys.argv[1], sep = ",", missing="?" )
+  print tab[1,4]
+  for x in xrange( len( tab ) ) : 
+    for y in xrange( len( tab ) ) :
+      print x, y, tab.dist(x,y)
