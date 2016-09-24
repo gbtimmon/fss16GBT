@@ -22,3 +22,15 @@ MiniBatch KMeans
   12.         n <- 1/v[c]
   13.         c <- c - nc + cx
   14.       
+
+"""
+from Table import Table, CSVReader
+import sys
+
+k   = int(sys.argv[1])
+b   = int(sys.argv[2])
+t   = int(sys.argv[3])
+tab = CSVReader( sys.argv[4] ).table()
+
+print (
+

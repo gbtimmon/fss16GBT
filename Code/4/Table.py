@@ -9,33 +9,42 @@
 ###
 
 from __future__ import print_function
+import random
 import math
 import sys
 import re
-
 sys.dont_write_bytecode = True
 
-def cache( func ) : 
+class cache():
   """
-  Some data from tables is only needed to be computed once. 
-  if this is the cache (hey look I made a pun), then we will
-  return a saved value. Right now only support no input functions
-  but could be expanded to consider inputs. 
+  TODO - FIX
+  Broken -- needs to be fix but is currently commented out
+  The cache seems to not work in objects. Need to debug
   """
-  retVal = None
-  def memory( ) :
-     if retVal == None:
-        retVal = func()
-     return retVal
-    
+  def __init__(i, func):
+    i.func = func
+    i.val  = None
+
+  def __call__(i):
+    print(i)
+    if i.val is None : i.val = i.func()
+    return i.val
+
+
 class Vector : 
+  """
+  Vector class add a standard interface to data objects which are 
+  wrappers for any list of data. Just as a sub set of a list returns a 
+  new instance of list, any subset of vector wil return a new instance of 
+  vector. Shouldnt be noticable slower than normal list operations. 
+  """
   def __len__( i )           : return len( i.data ) 
   def __getitem__( i , x )   : return i.data[x]
   def __iter__( i )          : return i.data.__iter__()
   def __setitem__( i, x, y ) : i.data[x] = y
   def __str__( i )           : return i.data.__str__()
   def __repr__( i )          : return i.data.__repr__()
-  def __copy__( i )          : return i.__class__( i ) 
+  def __copy__( i )          : return i.__class__(i) 
   def copy( i )              : return i.__copy__()
 
 class CSVReader( ) : 
@@ -86,25 +95,45 @@ class Row( Vector ):
      
 
 class Table(Vector):
-  
+  """
+  Table is a Vector but it has a slightly altered behavior in that a subest of a table is 
+  another table instance
+  """ 
   idGen = 0
 
-  def __init__( i, stream, shallowCopy=True ) : 
+  def __init__( i, stream, noHeader=False, header=None, shallowCopy=True ) : 
+
     i.rowCount = 0 
     i.id       = Table.idGen = Table.idGen + 1 
-    i.header   = Header( stream.__iter__().next() )
-    i.data     = []
+    if header is None and not noHeader : 
+      i.header = Header( stream.__iter__().next() )
+    elif not noHeader : 
+      i.header = Header( header )
+    else :
+      i.header = None
+      
+    i.data = []
 
     for x in stream : 
       i.rowCount += 1
+      if i.header is None :
+        i.header = Header( range(len(x)) )
       i.header.add(x)
       if shallowCopy :
         i.data.append(x)
       else :
         i.data.append( x.copy() )
 
+  def __getitem__( i, x ) : 
+    if( isinstance(x, int) ):
+       return Vector.__getitem__(i, x) 
+    if ( isinstance( x, tuple ) or isinstance( x, list ) ) : 
+       return Table( [ i[y] for y in x ], header=i.colNames() )
+
+  def copy( i ) :
+     return i.__class__( i, header=i.header, shallowCopy=True )
   def deepcopy( i ) :
-     return i.__class__( i, shallowCopy=False )
+     return i.__class__( i, header=i.header, shallowCopy=False )
 
   def furthest( i, x ) : 
     arr = i.dist(x)
@@ -114,6 +143,15 @@ class Table(Vector):
     arr = i.dist(x)
     arr_min = min( [ k for k in arr if k > 0 ] )
     return [ j for j,k in enumerate(arr) if k == arr_min ]
+ 
+  def sample( i, n, percent=False, shallowCopy=True ) :
+    if percent :
+      if n > 1 or n < 0 : 
+        raise TypeError("percent out of bounds")
+      n = len(i) * n
+    return Table( random.sample(i, n), header=i.colNames(), shallowCopy=shallowCopy )
+
+    
 
   def dist( i, a, b=None, f=2 ) :
 
@@ -148,24 +186,22 @@ class Table(Vector):
 
     return [ _dist(i, a, x) for x in range(len(i))]
 
+  def colNames( i ) :
+    return [str(x) for x in i.header ]
+
   def __str__( i ) : 
-    return ("Table(" + str(i.id) + ")\n  "
-            +"\n  ".join(map(str, i.data) ) ) 
+    return "Table(" + str(i.id) + ")\n" + "\n".join([ str(x) for x in i.header ])
     
 
 class Header(Vector) : 
   def __init__( i, col ) : 
     i.data = [ _Header(col[x], x) for x in xrange(len(col)) ]
 
-  @cache
-  def names( i ) :
-    return [x.name for x in i.cols ]
-
   def add( i, row ) :
     for a,b in zip( i, row ) : a.add(b)   
 
   def __str__( i ) : 
-    return str([str(x) for x in i.data ])
+    return str([ str(x) for x in i.data ])
  
 
 class _Header:
@@ -179,8 +215,7 @@ class _Header:
     i.pos  = pos
     i.dep  = False
     i.stat = None
-    i.name = name
-    i.stat = None
+    i.name = name.strip()
 
   def add( i, x ) : 
     if i.stat == None :
@@ -193,15 +228,9 @@ class _Header:
       i.stat.add( x ) 
 
   def __str__( i ) :
-    return str(i.name ) 
+    return "Pos : %5s %20s %5s" % ( str(i.pos), str(i.name) ,str(i.dep) )
 
 class Num:
-
-  def rowStr( i ) :
-    if( i.invalid ) :
-      return (("%10s  %10s  %10s  %10s  %10s") % ( "-", "-","-","-","-" ))
-    else :
-      return (("%10.4f  %10.4f  %10.4f  %10.4f  %10.4f") % ( i.mu,  i.m2, i.sd(), i.min, i.max))
 
   def __init__( i ) :
     i.mu      = 0
@@ -209,17 +238,12 @@ class Num:
     i.m2      = 0
     i.max     = -sys.maxint - 1
     i.min     = sys.maxint
-    i.invalid = False
+
+  def __str__( i ) : 
+    return "%s %s %s %s %s" %( str(i.mu), str(i.n), str(i.m2), str(i.max), str(i.min))
 
   def add( i, x):
-    if( i.invalid ) :
-      return 
-
-    try :
-      x = float(x)
-    except Exception:
-      i.invalid = True
-      return
+    x = float(x)
 
     i.n += 1
     i.max = max( i.max, x )
@@ -256,7 +280,7 @@ class Num:
 """
 class Sym():
 
-  def rowStr( i ) :
+  def __str__( i ) :
     return (("%5.4f  %5s  %-20s") % ( i.ent(), str(i.most),  str(i.mode)))
 
   def __init__( i ):
