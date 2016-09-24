@@ -91,6 +91,7 @@ class Row( Vector ):
 
   def __str__( i ) : 
     return ("Row(" + str(i.id) + ") " + str(i.data) ) 
+
      
 
 class Table(Vector):
@@ -196,6 +197,13 @@ class Table(Vector):
   def dist( i, x ) : 
     return i[ i.disti( x ) ]
 
+  def blendRow(i, into, frm, rate ) :
+    if isinstance( into, int ) : into = i[into]
+    for x in range(len( into ) ) :
+      if not i.header[x].isDep() :
+        into[x] = ((1-rate)*into[x]) + (rate*frm[x])
+       
+
   def colNames( i ) :
     return [str(x.name) for x in i.header ]
 
@@ -233,7 +241,7 @@ class _Header:
     i.pos  = pos
     i.dep  = True if( name[0] == "=" ) else False
     i.stat = None
-    i.name = re.sub(r'[=><\-_]', '', name.strip())
+    i.name = name.strip()
 
   def add( i, x ) : 
     if i.stat == None :
