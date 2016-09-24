@@ -1,24 +1,34 @@
 import os
-def factory(  params ) : 
+class ReaderFactory ( ) : 
+  @staticmethod
+  def get (  params ) : 
+    """
+    Not really a real factory pattern yet, Im to lazy to actually do it right now
+    but I think there should be one here eventually if I want good performance. :)
 
-  fileName = params["fileName"]
+    I want to come up with a way to generalize the datasource metadata but Im not quite 
+    there yet. I might never do it if all we ever work with is arff and .csv since they are simple. 
 
-  def checkParams( params, validParams ) :
-    for x in params.keys() : 
-      if( x not in validParams ) : 
-        raise ValueError( str(x) + " is and invalid parameter for file type " + os.path.splitext(fileName)[1] )
+    """
 
-  if( fileName.lower().endswith(".csv") ) :
-    checkParams( params, ["fileName", "sep", "missing"] )
-    return _CSVReader(params).__iter__()
+    
+    fileName = params["fileName"]
 
-  else :
-    return None
+    def checkParams( params, validParams ) :
+      for x in params.keys() : 
+        if( x not in validParams ) : 
+          raise ValueError( str(x) + " is and invalid parameter for file type " + os.path.splitext(fileName)[1] )
+
+    if( fileName.lower().endswith(".csv") ) :
+      checkParams( params, ["fileName", "sep", "missing"] )
+      return _CSVReader(params).__iter__()
+
+    else :
+      return None
 
 
    
 class _CSVReader : 
-
   def __init__ (self, params) : 
     
     import sys

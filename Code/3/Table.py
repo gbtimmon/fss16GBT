@@ -1,21 +1,23 @@
-import FileReader
+from __future__ import print_function
+from FileReader import ReaderFactory
 import math
 import sys
 import re
-
 sys.dont_write_bytecode = True
 
-class Table:
+"""
+   Table reader code for loading either a RAM data set
+   or a filesystem file into a file 
 
-  def __len__( self ) :
-    return self.rowCount
+"""
+class Table:
 
   def __init__( self, **kwargs ) : 
 
     self.filename = kwargs["fileName"]
     self.rowCount = 0
 
-    reader = FileReader.factory( kwargs )
+    reader = ReaderFactory.get( kwargs )
 
     self.header = Header(reader.next())
     self.data   = []
@@ -24,35 +26,54 @@ class Table:
       self.header.update(x)
       self.data.append(x)
 
-  def __getitem__( self, tup) :
+  def __len__( self ) :  
+    return self.rowCount
 
-    i,j = tup
-
-    if( i == -1 ) : 
-      if( j == None ) : return self.header
-      return self.header[j]
-
-    if( j == None ) : return self.data[i]
-    return self.data[i][j]
+  def __getitem__( self, i ) :
+    return self.data[i]
   
-  def dist( self, a, b, f=2 ) :
-    d = 0
-    n = len( self.header )
-    s = 0
+  def furthest( self, a ) :
+    arr = self.dist(a)
+    return [i for i,j in enumerate(arr) if j == max(arr) ]
 
-    if( n == 0 ) : return None
+  def closest( self, a ) : 
+    arr = self.dist(a) 
+    arr_min = min( [ x for x in arr if x > 0 ] )
+    return [i for i,j in enumerate(arr) if j == arr_min ]
 
-    for col in xrange(n):
-       hd = self.header[ col ]
-       v1 = self[ a, col ]
-       v2 = self[ b, col ]
-     
-       if( v1 is None and v2 is None ): continue
-       if( v1 is None ) : v1 = hd.furthest(v2)
-       if( v2 is None ) : v2 = hd.furthest(v1)
-       s += hd.dist( v1, v2) ** f
 
-    return (( float(s) ** (1.0/float(f)))/(float(n)**(1.0/float(f))))
+  def dist( self, a, b=None, f=2 ) :
+
+    def _dist( self, a, b, f=2 ) :
+      """ Helper Function
+      This is an iimplementation of AHAs algorithm. 
+      """
+
+      d = 0
+      n = len( self.header )
+      s = 0
+  
+      if( n == 0 ) : return None
+  
+      for col in xrange(n):
+         hd = self.header[ col ]
+         if( hd.isDep() ) : continue
+
+         v1 = self[ a ][ col ]
+         v2 = self[ b ][ col ]
+       
+         if( v1 is None and v2 is None ): continue
+         if( v1 is None ) : v1 = hd.furthest(v2)
+         if( v2 is None ) : v2 = hd.furthest(v1)
+         s += hd.dist( v1, v2) ** f
+  
+      return (( float(s) ** (1.0/float(f)))/(float(n)**(1.0/float(f))))
+    "END HELPER FUNCTION"
+
+    if b is not None :
+      return _dist(self, a, b=b)
+  
+    return [ _dist(self, a, x) for x in range(len(self))]
 
   def __str__(self) :
      return "\n     File Name :" + str(self.filename) + "\n     Row Count : " + str(self.rowCount) + "\n\n" + str(self.header)
@@ -85,9 +106,10 @@ class Header:
     
   def __init__( self, cols ) : 
     
+    deps = [ (x[0] == "=") for x in cols ]
     cols = map( lambda x: re.sub("[^a-zA-Z0-9_ ]","",x), cols )
     self.rowCount = 0
-    self.obj = [ _Header(x) for x in cols ]
+    self.obj = [ _Header(x, dep=y) for x,y in zip(cols, deps) ]
 
   def names ( self ) :
     return [ x.name for x in self.obj ] 
@@ -102,16 +124,21 @@ class Header:
     
     
 class _Header:
-  def __init__( self, name) : 
+  def __init__( self, name, dep=False ) : 
 
+    self.depVar = dep
     self.number = Num()
     self.symbol = Sym()
     self.name   = name
 
   def __str__(self) :
+    name = self.name if not self.depVar else "=" +self.name
     return ( 
-           ( "%20s | %s %s\n" % ( str(self.name), self.symbol.rowStr(), self.number.rowStr() ))
+           ( "%20s | %s %s\n" % ( name, self.symbol.rowStr(), self.number.rowStr() ))
     )
+
+  def isDep( self ) :
+    return self.depVar
 
   def norm( self, x ) :
     return self.symbol.norm(x) if ( self.number.invalid ) else self.number.norm(x) 
@@ -205,7 +232,7 @@ class Sym():
 
   def norm( self, x )     : return x
   def dist( self, x, y)   : return 0 if x == y else 1
-  def furthest( self, x ) : return None
+  def furthest( self, x ) : return "_" + x
 
   def ent(self):
     tmp = 0
@@ -218,7 +245,29 @@ class Sym():
 if __name__ == '__main__' : 
   import sys
   tab = Table(fileName=sys.argv[1], sep = ",", missing="?" )
-  print tab[1,4]
-  for x in xrange( len( tab ) ) : 
-    for y in xrange( len( tab ) ) :
-      print x, y, tab.dist(x,y)
+  f1 = tab.furthest(0)
+  c1 = tab.closest(0)
+  f2 = tab.furthest(1)
+  c2 = tab.closest(1)
+
+  print( "ROW 1 :",  tab[0] ) 
+  print()
+  print( "Furthest : ", tab.furthest(0) )
+  print()
+  print( *[ tab[x] for x in tab.furthest(0) ], sep="\n")
+  print()
+  print( "Closest : ", tab.closest(0) )
+  print()
+  print( *[ tab[x] for x in tab.closest(0) ], sep="\n")
+  print()
+  print( "ROW 2 :",  tab[1] ) 
+  print()
+  print( "Furthest : ", tab.furthest(1) )
+  print()
+  print( *[ tab[x] for x in tab.furthest(1) ], sep="\n")
+  print()
+  print( "Closest : ", tab.closest(1) )
+  print()
+  print( *[ tab[x] for x in tab.closest(1) ], sep="\n")
+
+
