@@ -24,6 +24,7 @@ MiniBatch KMeans
   14.       
 
 """
+from __future__ import print_function
 from Table import Table, CSVReader
 import sys
 
@@ -32,5 +33,16 @@ b   = int(sys.argv[2])
 t   = int(sys.argv[3])
 tab = CSVReader( sys.argv[4] ).table()
 
-print (
+# 1
+C = tab.sample( k ) 
+V = 0
+for i in xrange( t ) :
+  M = tab.sample( b )
+  
+  for x in M :
+    print ( x ) 
+    D = [ tab.closest( c ) for c in C ]
+    print (D )
+
+
 

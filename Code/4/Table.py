@@ -26,7 +26,6 @@ class cache():
     i.val  = None
 
   def __call__(i):
-    print(i)
     if i.val is None : i.val = i.func()
     return i.val
 
@@ -102,7 +101,6 @@ class Table(Vector):
   idGen = 0
 
   def __init__( i, stream, noHeader=False, header=None, shallowCopy=True ) : 
-
     i.rowCount = 0 
     i.id       = Table.idGen = Table.idGen + 1 
     if header is None and not noHeader : 
@@ -116,9 +114,12 @@ class Table(Vector):
 
     for x in stream : 
       i.rowCount += 1
+
       if i.header is None :
         i.header = Header( range(len(x)) )
+
       i.header.add(x)
+
       if shallowCopy :
         i.data.append(x)
       else :
@@ -135,14 +136,20 @@ class Table(Vector):
   def deepcopy( i ) :
      return i.__class__( i, header=i.header, shallowCopy=False )
 
-  def furthest( i, x ) : 
-    arr = i.dist(x)
+  def furthesti( i, x ) : 
+    arr = i.disti(x)
     return [ i for i,j in enumerate(arr) if j == max(arr) ] 
 
-  def closest( i, x ) : 
-    arr = i.dist(x)
+  def furthest( i, x ) :
+    return i[ i.furthesti(x) ]
+
+  def closesti( i, x ) : 
+    arr = i.disti(x)
     arr_min = min( [ k for k in arr if k > 0 ] )
     return [ j for j,k in enumerate(arr) if k == arr_min ]
+  
+  def closest( i, x ) :
+    return i[ i.closesti(x) ]
  
   def sample( i, n, percent=False, shallowCopy=True ) :
     if percent :
@@ -151,9 +158,7 @@ class Table(Vector):
       n = len(i) * n
     return Table( random.sample(i, n), header=i.colNames(), shallowCopy=shallowCopy )
 
-    
-
-  def dist( i, a, b=None, f=2 ) :
+  def disti( i, a, b=None, f=2 ) :
 
     def _dist( i, a, b, f=f ) :
       """ Helper Function
@@ -169,9 +174,9 @@ class Table(Vector):
       for col in xrange(n):
          hd = i.header[ col ]
          if( hd.isDep() ) : continue
-
-         v1 = i[ a ][ col ]
-         v2 = i[ b ][ col ]
+         
+         v1 = a[ col ]
+         v2 = b[ col ]
 
          if( v1 is None and v2 is None ): continue
          if( v1 is None ) : v1 = hd.furthest(v2)
@@ -181,16 +186,28 @@ class Table(Vector):
       return (( float(s) ** (1.0/float(f)))/(float(n)**(1.0/float(f))))
     "END HELPER FUNCTION"
 
+    ar = a if isinstance(a, Row ) else i[a]
     if b is not None :
-      return _dist(i, a, b=b)
+      br = b if isinstance( b, Row ) else i[b]
+      return _dist(i, ar, b=br)
 
-    return [ _dist(i, a, x) for x in range(len(i))]
+    return [ _dist(i, ar, i[x]) for x in range(len(i))]
+
+  def dist( i, x ) : 
+    return i[ i.disti( x ) ]
 
   def colNames( i ) :
-    return [str(x) for x in i.header ]
+    return [str(x.name) for x in i.header ]
+
+  def dataStr( i ) :
+    return "\n".join([ str(x) for x in i.data])
 
   def __str__( i ) : 
-    return "Table(" + str(i.id) + ")\n" + "\n".join([ str(x) for x in i.header ])
+    return (
+      "Table(" + str(i.id) + ")\n" +
+      "  Row count : "+str(i.rowCount) + "\n\n"+
+      "\n".join([ str(x) for x in i.header ])
+    )
     
 
 class Header(Vector) : 
@@ -198,7 +215,8 @@ class Header(Vector) :
     i.data = [ _Header(col[x], x) for x in xrange(len(col)) ]
 
   def add( i, row ) :
-    for a,b in zip( i, row ) : a.add(b)   
+    for x, y in zip(i.data, row) : 
+       x.add(y)
 
   def __str__( i ) : 
     return str([ str(x) for x in i.data ])
@@ -213,9 +231,9 @@ class _Header:
 
   def __init__ ( i, name, pos) : 
     i.pos  = pos
-    i.dep  = False
+    i.dep  = True if( name[0] == "=" ) else False
     i.stat = None
-    i.name = name.strip()
+    i.name = re.sub(r'[=><\-_]', '', name.strip())
 
   def add( i, x ) : 
     if i.stat == None :
@@ -225,10 +243,10 @@ class _Header:
       except : 
         x = str( x )
         i.stat = Sym()
-      i.stat.add( x ) 
+    i.stat.add( x ) 
 
   def __str__( i ) :
-    return "Pos : %5s %20s %5s" % ( str(i.pos), str(i.name) ,str(i.dep) )
+    return "Pos:%3s Name:%-15s Dep:%5s %s" % ( str(i.pos), str(i.name) ,str(i.dep), str(i.stat))
 
 class Num:
 
@@ -240,7 +258,7 @@ class Num:
     i.min     = sys.maxint
 
   def __str__( i ) : 
-    return "%s %s %s %s %s" %( str(i.mu), str(i.n), str(i.m2), str(i.max), str(i.min))
+    return "NUM mu:%s n:%s m2:%s max:%s min:%s" %( str(i.mu), str(i.n), str(i.m2), str(i.max), str(i.min))
 
   def add( i, x):
     x = float(x)
@@ -271,17 +289,14 @@ class Num:
   def sd( i ):
     return 0 if i.n <= 2 else (i.m2/(i.n - 1))**0.5
 
-
 """
     Sym Class
-
     Stores the symbols metadata. 
-
 """
 class Sym():
 
   def __str__( i ) :
-    return (("%5.4f  %5s  %-20s") % ( i.ent(), str(i.most),  str(i.mode)))
+    return (("SYM ENT : %5.4f  MOST : %5s  MODE : %-20s") % ( i.ent(), str(i.most),  str(i.mode)))
 
   def __init__( i ):
      i.counts, i.most, i.mode, i.n = {},0,None,0
