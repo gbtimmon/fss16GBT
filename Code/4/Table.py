@@ -28,18 +28,17 @@ def cache( func ) :
         retVal = func()
      return retVal
     
-class Stream : 
-   def next( i ) : return i.__iter__().next()
-
 class Vector : 
-   def __len__( i )           : return len( i.data ) 
-   def __getitem__( i , x )   : return i.data[x]
-   def __iter__( i )          : return i.data.__iter__()
-   def __setitem__( i, x, y ) : i.data[x] = y
-   def __str__( i )           : return i.data.__str__()
-   def __repr__( i )          : return i.data.__repr__()
+  def __len__( i )           : return len( i.data ) 
+  def __getitem__( i , x )   : return i.data[x]
+  def __iter__( i )          : return i.data.__iter__()
+  def __setitem__( i, x, y ) : i.data[x] = y
+  def __str__( i )           : return i.data.__str__()
+  def __repr__( i )          : return i.data.__repr__()
+  def __copy__( i )          : return i.__class__( i ) 
+  def copy( i )              : return i.__copy__()
 
-class CSVReader( Stream ) : 
+class CSVReader( ) : 
 
   def __init__ ( i, filename, sep="," ) : 
     
@@ -68,7 +67,7 @@ class CSVReader( Stream ) :
 
     inv = inv.strip()
     return str(inv)
-
+    
   def table( i ) : 
     return Table( i )
 
@@ -79,8 +78,11 @@ class Row( Vector ):
   """
   idGen = 0 
   def __init__(i, data) : 
-     i.data = data
+     i.data = [ x for x in data ]
      i.id   = Row.idGen = Row.idGen + 1
+
+  def __str__( i ) : 
+    return ("Row(" + str(i.id) + ") " + str(i.data) ) 
      
 
 class Table(Vector):
@@ -90,13 +92,19 @@ class Table(Vector):
   def __init__( i, stream, shallowCopy=True ) : 
     i.rowCount = 0 
     i.id       = Table.idGen = Table.idGen + 1 
-    i.header   = Header( stream.next() )
+    i.header   = Header( stream.__iter__().next() )
     i.data     = []
 
     for x in stream : 
       i.rowCount += 1
       i.header.add(x)
-      i.data.append(x)
+      if shallowCopy :
+        i.data.append(x)
+      else :
+        i.data.append( x.copy() )
+
+  def deepcopy( i ) :
+     return i.__class__( i, shallowCopy=False )
 
   def furthest( i, x ) : 
     arr = i.dist(x)
@@ -139,6 +147,11 @@ class Table(Vector):
       return _dist(i, a, b=b)
 
     return [ _dist(i, a, x) for x in range(len(i))]
+
+  def __str__( i ) : 
+    return ("Table(" + str(i.id) + ")\n  "
+            +"\n  ".join(map(str, i.data) ) ) 
+    
 
 class Header(Vector) : 
   def __init__( i, col ) : 
@@ -267,29 +280,4 @@ class Sym():
       if p:
         tmp -= p*math.log(p,2)
     return tmp  
-
-if __name__ == '__main__' :
-  
-  tab = CSVReader( sys.argv[1] ).table()
-  print( tab.header )
-  print( tab.data )
-  print( "ROW 1 :",  tab[0] )
-  print()
-  print( "Furthest : ", tab.furthest(0) )
-  print()
-  print( *[ tab[x] for x in tab.furthest(0) ], sep="\n")
-  print()
-  print( "Closest : ", tab.closest(0) )
-  print()
-  print( *[ tab[x] for x in tab.closest(0) ], sep="\n")
-  print()
-  print( "ROW 2 :",  tab[1] )
-  print()
-  print( "Furthest : ", tab.furthest(1) )
-  print()
-  print( *[ tab[x] for x in tab.furthest(1) ], sep="\n")
-  print()
-  print( "Closest : ", tab.closest(1) )
-  print()
-  print( *[ tab[x] for x in tab.closest(1) ], sep="\n")
 
