@@ -19,7 +19,8 @@ is evaluated during the evolution process. For each individual a rating is given
 ### Genenic operators
 - Selection operator: Select parents increase the probability to reproduce members of the population that have good values of the objective function.
 - Crossover operator: recombination of characteristics of parents during reproductions, so next generation can inherit them.
-- Mutation: applied to the individuals with a probability given for mutation rate.
+- Mutation operator: applied to the individuals with a probability given for mutation rate.
+
 ### GA based feature selection and parameters optimization
 - Chromosome design: The chromosome is divided into two parts- parameters of the technique and the inpur features to be sleected. The minimum and maximum value of each parameter is decided by the user. In the chromosome, the description of feature representation is: the bit with value ‘1’ indicates that the feature is not removed; ‘0’ indicates that the input feature must be removed.
 
