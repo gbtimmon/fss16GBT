@@ -34,6 +34,5 @@ In all the data sets, our method achieved the best performance in terms of PRED(
 Our simulations have shown that the
 GA-based method was able to improve performance of the three machine learning techniques considered in the problem of software effort estimation. For future work, they propose to use particle swarm optimization. The want to see if PSO works better than GAin many classification problems.
 
-I would like to know more about the six data sets they were comparing and why they got slightly different conclusions for each.
 
-- 
+I would like to know more about the six data sets they were comparing and why they got slightly different conclusions for each.
