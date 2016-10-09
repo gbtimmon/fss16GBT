@@ -1,11 +1,20 @@
+from __future__ import division
+from Table import Table, CSVReader
+from 
+from math import floor
+import sys
+
+__DOC__=(
 """
 MiniBatch KMeans
+  Author : Greg Timmons
+  Date   : Fall 2016
 
   Input :
-    @k     number of clusters
-    @b     batch size
-    @t     iterations 
-    @table table object containing data
+    @1     number of clusters
+    @2     batch size
+    @3     iterations 
+    @4     dataset file, csv format
   
   Algorithm :
    0.   let C be a set of k randomly picked centers
@@ -20,26 +29,18 @@ MiniBatch KMeans
    9.         c <- c - nc + cx
 
 """
-from __future__ import division
-from Table import Table, CSVReader
-from math import floor
-import sys
+)
 
-class Unbuffered(object):
-  def __init__(self, stream):
-    self.stream = stream
-  def write(self, data):
-    self.stream.write(data)
-    self.stream.flush()
-  def __getattr__(self, attr):
-    return getattr(self.stream, attr)
 
-sys.stdout = Unbuffered(sys.stdout)
+try : 
+  k   = int(sys.argv[1])
+  b   = int(sys.argv[2])
+  t   = int(sys.argv[3])
+  tab = CSVReader( sys.argv[4] ).table()
+except : 
+  sys.stderr.write("Invalid input parameters!\n" + __DOC__ )
+  exit(1)
 
-k   = int(sys.argv[1])
-b   = int(sys.argv[2])
-t   = int(sys.argv[3])
-tab = CSVReader( sys.argv[4] ).table()
 
 C  = tab.sample( k, shallowCopy=False ) # 0. initial random centers
 V = [0] * len(C)                        # 1. size of the current cluster
@@ -55,11 +56,11 @@ for i in xrange( t ) :                  # 2. for all iters
     C.blendRow(c, x, 1/V[c] )           # 8,9. blend the center
     
 
-print("\r Complete")
 print()
-print (C)
+print("Input Summary")
+print(C)
 print()
-print (C.dataStr())
+print(C.dataStr())
     
 
 
