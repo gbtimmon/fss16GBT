@@ -7,8 +7,13 @@
 * [KD-Tree](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KDTree.py)
 * [KNN](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.py)
 
-## Sample Runs 
+## Runtime comparison
 
-Sample runs were run on Diabetes.csv from ninja 
+Sample runs were run on Diabetes10000.csv from ninja 
+Training was performed on 10000 row and training was tested on another 10000 rows. 
 
-   
+ | Algorithm     |   Training Time    | Testing Time  | Output snapshot |
+ | ------------- | ------------------ | ------------- | ----------------|
+ | [KNN](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.py) | 
+ | [Mini Batch K Means](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/MiniBatchKMeans.py) |
+ | [KD-Tree](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KDTree.py) |
