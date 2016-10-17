@@ -9,6 +9,7 @@
 ###
 
 from __future__ import print_function
+from collections import Counter 
 import random
 import math
 import sys
@@ -46,6 +47,49 @@ class Vector :
   def __copy__( i )          : return i.__class__(i) 
   def copy( i )              : return i.__copy__()
 
+def Reader( filename ) : 
+  if( filename.lower().endswith("csv") ) : 
+    return CSVReader( filename ) 
+  elif( filename.lower().endswith("arff") ) : 
+    return ARFFReader( filename )
+  raise ValueError( "Invalid Filetype" )
+    
+class ARFFReader( ) :
+  
+  def __init__( i, filename ) :
+
+    i.filename   = filename
+    i.sep        = ","
+    i.attr       = [] 
+    i.fileHandle = open( i.filename, "r" ) if( i.filename != None ) else sys.stdin
+
+    for x in i.fileHandle : 
+      if( x.lower().startswith("@data" ) ) : 
+        break
+      elif( x.lower().startswith("@attribute" ) ):
+        i.attr.append( x.strip().split()[1] )
+
+    i.attr[-1] = "=" + i.attr[-1]
+
+
+  def __iter__ ( i ) :
+    for line in i.fileHandle : 
+      line = line.strip()
+      if( line.startswith("@") ) : continue
+      if( len(line) == 0 )       : continue
+      yield Row( map( i.wrangle, line.split( i.sep ) ) )
+
+  def wrangle(i, inv ) :
+    try  : return int(inv)
+    except Exception : pass
+    try  : return float(inv)
+    except Exception : pass
+    inv = inv.strip()
+    return str(inv)
+
+  def table( i ) :
+    return Table( i, header=i.attr ) 
+
 class CSVReader( ) : 
 
   def __init__ ( i, filename, sep="," ) : 
@@ -64,7 +108,7 @@ class CSVReader( ) :
       yield Row( map( i.wrangle, line.split( i.sep ) ) )
 
   def wrangle(i, inv ) :
-
+ 
     if( int == i.missing ) : return None
 
     try  : return int(inv)
@@ -90,9 +134,7 @@ class Row( Vector ):
      i.id   = Row.idGen = Row.idGen + 1
 
   def __str__( i ) : 
-    return ("Row(" + str(i.id) + ") " + str(i.data) ) 
-
-     
+    return "Row(" + str(i.id) + ") " + str( i.data )
 
 class Table(Vector):
   """
@@ -102,6 +144,7 @@ class Table(Vector):
   idGen = 0
 
   def __init__( i, stream, noHeader=False, header=None, shallowCopy=True ) : 
+
     i.rowCount = 0 
     i.id       = Table.idGen = Table.idGen + 1 
     if header is None and not noHeader : 
@@ -125,7 +168,7 @@ class Table(Vector):
         i.data.append(x)
       else :
         i.data.append( x.copy() )
-
+ 
   def __getitem__( i, x ) : 
     if( isinstance(x, int) ):
        return Vector.__getitem__(i, x) 
@@ -137,33 +180,32 @@ class Table(Vector):
   def deepcopy( i ) :
      return i.__class__( i, header=i.header, shallowCopy=False )
 
-  def furthesti( i, x ) : 
-    arr = i.disti(x)
-    return [ i for i,j in enumerate(arr) if j == max(arr) ] 
+  def furthesti( i, x, n=1 ) : 
+    arr = i.dist(x)
+    arr.sort( key=lambda x : x[1] ) 
+    return arr[-n:]
 
-  def furthest( i, x ) :
-    return i[ i.furthesti(x) ]
+  def furthest( i, x, n=1) :
+    return i[ [ x[0] for x in i.furthest(x, n=n) ] ]
 
-  def closesti( i, x ) : 
-    arr = i.disti(x)
-    arr_min = min( [ k for k in arr if k > 0 ] )
-    return [ j for j,k in enumerate(arr) if k == arr_min ]
+  def closesti( i, row, n=1 ) : 
+    arr = i.dist( row )
+    arr.sort( key=lambda x : x[1] ) 
+    return arr[:n]
   
-  def closest( i, x ) :
-    return i[ i.closesti(x) ]
- 
-  def sample( i, n, percent=False, shallowCopy=True ) :
-    if percent :
-      if n > 1 or n < 0 : 
-        raise TypeError("percent out of bounds")
-      n = len(i) * n
-    return Table( random.sample(i, n), header=i.colNames(), shallowCopy=shallowCopy )
+  def closest( i, x, n=1 ) :
+    return i[ [ x[0] for x in i.closesti(x, n=n) ] ] 
 
-  def disti( i, a, b=None, f=2 ) :
+  def knn(i, row, n=1 ) :
+    nn = map( tuple, i.closest( row, n=n ).getDependent() ) 
+    return  Counter(nn).most_common(1)[0] 
+    
 
+  def dist( i, a, b=None, f=2 ) :
     def _dist( i, a, b, f=f ) :
       """ Helper Function
       This is an iimplementation of AHAs algorithm.
+      it returns dist between two rows. 
       """
 
       d = 0
@@ -171,7 +213,7 @@ class Table(Vector):
       s = 0
 
       if( n == 0 ) : return None
-
+      
       for col in xrange(n):
          hd = i.header[ col ]
          if( hd.isDep() ) : continue
@@ -192,23 +234,46 @@ class Table(Vector):
       br = b if isinstance( b, Row ) else i[b]
       return _dist(i, ar, b=br)
 
-    return [ _dist(i, ar, i[x]) for x in range(len(i))]
+    return [ (x, _dist(i, ar, i[x]) ) for x in range(len(i)) if i[x].id != ar.id ]
 
-  def dist( i, x ) : 
-    return i[ i.disti( x ) ]
+  def sample( i, n, percent=False, shallowCopy=True ) :
+    if percent :
+      if n > 1 or n < 0 : 
+        raise TypeError("percent out of bounds")
+      n = len(i) * n
+    return Table( random.sample(i, n), header=i.colNames(), shallowCopy=shallowCopy )
 
   def blendRow(i, into, frm, rate ) :
     if isinstance( into, int ) : into = i[into]
     for x in range(len( into ) ) :
       if not i.header[x].isDep() :
         into[x] = ((1-rate)*into[x]) + (rate*frm[x])
-       
+
+  def oneHot( i ) :
+    """ 
+       Generate a one hot version of a table
+       good for clustering symbolic data. 
+    """
+    pass
+
+  def getDependent( i ) : 
+    index = [ x for x in xrange(len(i.header)) if i.header[x].isDep() ] 
+    head = [ i.header[x].name for x in index ] 
+    data = [ [ j[x] for x in index ] for j in i ]
+    return Table( data, header=head ) 
+  
+  """DEPRECATE?! """  
+  def getDependentValues( i , x ) :
+    return [ x[y] for y in xrange(len(i.header)) if i.header[y].isDep() ] 
 
   def colNames( i ) :
     return [str(x.name) for x in i.header ]
 
   def dataStr( i ) :
     return "\n".join([ str(x) for x in i.data])
+
+  def __repr__( i ) : 
+    return i.__str__()
 
   def __str__( i ) : 
     return (
