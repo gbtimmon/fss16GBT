@@ -1,4 +1,4 @@
-# Homework 4 : KD-Trees and Mini batch K means. 
+i Homework 4 : KD-Trees and Mini batch K means. 
 
 ## Code : 
 
@@ -12,11 +12,11 @@
 Sample runs were run on Diabetes10000.csv from ninja 
 Training was performed on 10000 row and training was tested on another 10000 rows. 
 
-| Tables        | Are           | Cool  |
-| ------------- |:-------------:| -----:|
-| col 3 is      | right-aligned | $1600 |
-| col 2 is      | centered      |   $12 |
-| zebra stripes | are neat      |    $1 |
+| Algorithm     | Train Time    | Test Time | Output Image | 
+| ------------- |:-------------:| ---------:| ------------ |
+| col 3 is      | right-aligned | $1600 |  |
+| col 2 is      | centered      |   $12 |  |
+| zebra stripes | are neat      |    $1 |  |
 
 
  | Algorithm     |   Training Time    | Testing Time  | Output snapshot |
