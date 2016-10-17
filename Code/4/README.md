@@ -11,11 +11,12 @@ i Homework 4 : KD-Trees and Mini batch K means.
 
 Sample runs were run on Diabetes10000.csv from ninja 
 Training was performed on 10000 row and training was tested on another 10000 rows. 
+Time for loading table is not considered part of training - as a consequence KNN has no training time. 
 
 | Algorithm         | Train Time    | Test Time | Output Image | 
 | ----------------- |:-------------:| ---------:| ------------ |
-| KNN               | kmeansright-aligned | $1600 |  |
-| Mini Batch KMeans | 175.23852 sec | 3.78731 sec |  |
-| KD-Tree           | are neat      |    $1 |  |
+| KNN               | 0.0 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.output) |
+| Mini Batch KMeans | 175.23852 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/MiniBatchKMeans.output) |
+| KD-Tree           | 175.23852 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KDTree.output) |
 
 
