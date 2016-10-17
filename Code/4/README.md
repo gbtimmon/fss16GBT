@@ -14,6 +14,6 @@ Training was performed on 10000 row and training was tested on another 10000 row
 
  | Algorithm     |   Training Time    | Testing Time  | Output snapshot |
  | ------------- | ------------------ | ------------- | ----------------|
- | [KNN](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.py) | 
- | [Mini Batch K Means](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/MiniBatchKMeans.py) |
- | [KD-Tree](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KDTree.py) |
+ | [KNN](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.py) | ||
+ | [Mini Batch K Means](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/MiniBatchKMeans.py) |||
+ | [KD-Tree](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KDTree.py) |||
