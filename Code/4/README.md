@@ -15,7 +15,7 @@ Time for loading table is not considered part of training - as a consequence KNN
 
 | Algorithm         | Train Time    | Test Time | Output Image | 
 | ----------------- |:-------------:| ---------:| ------------ |
-| KNN               | 0.0 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.output) |
+| KNN               | 0.0 sec | 3877.9398 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.output) |
 | Mini Batch KMeans | 175.23852 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/MiniBatchKMeans.output) |
 | KD-Tree           | 175.23852 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KDTree.output) |
 
