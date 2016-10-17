@@ -12,6 +12,13 @@
 Sample runs were run on Diabetes10000.csv from ninja 
 Training was performed on 10000 row and training was tested on another 10000 rows. 
 
+| Tables        | Are           | Cool  |
+| ------------- |:-------------:| -----:|
+| col 3 is      | right-aligned | $1600 |
+| col 2 is      | centered      |   $12 |
+| zebra stripes | are neat      |    $1 |
+
+
  | Algorithm     |   Training Time    | Testing Time  | Output snapshot |
  | ------------- | ------------------ | ------------- | ----------------|
  | [KNN](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.py) | ||
