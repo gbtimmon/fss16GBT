@@ -47,8 +47,9 @@ def MiniBatchKNN( nClusters, bSize, iters, kNN, trainSet, testSet, log=sys.stdou
   b   = int(bSize)
   t   = int(iters)
   knn = int(kNN)
-  trn = Reader( trainSet ).table()
-  tst = Reader( testSet  ).table()
+  tab = Reader( trainSet ).table()
+  trn = tab.sample(10000)
+  tst = tab.sample(10000)
 
   out( "Training : \n" ) 
   out( "  Clusters : " + cstr( k, "b" ) + "\n")
@@ -81,8 +82,6 @@ def MiniBatchKNN( nClusters, bSize, iters, kNN, trainSet, testSet, log=sys.stdou
   out( "\n  Done!\n" ) 
   out( "\n  Time elpased : " + cstr( t1 - t0 , "b" ) + "\n\n" ) 
   out( "\nTesting : " )
-  
-  tst = tst.sample( 10 ) 
 
   out("=== Predictions on test data ===\n\n")
   out(" inst#     actual  predicted error prediction\n")

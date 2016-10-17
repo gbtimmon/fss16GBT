@@ -15,7 +15,7 @@ Training was performed on 10000 row and training was tested on another 10000 row
 | Algorithm         | Train Time    | Test Time | Output Image | 
 | ----------------- |:-------------:| ---------:| ------------ |
 | KNN               | kmeansright-aligned | $1600 |  |
-| Mini Batch KMeans | centered      |   $12 |  |
+| Mini Batch KMeans | 175.23852 sec | 3.78731 sec |  |
 | KD-Tree           | are neat      |    $1 |  |
 
 
