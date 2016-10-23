@@ -1,9 +1,9 @@
-from __future__   import division, print_function
-from Table        import Table, Reader
-from XStream      import XStream, cstr
-from math         import floor
-from time         import clock
-from PrintResults import print_results
+from __future__ import division, print_function
+from Table      import Table, Reader
+from O          import o
+from math       import floor
+from time       import clock
+from ResultSet  import ResultSet
 import sys
 
 __DOC__=(
@@ -20,49 +20,49 @@ KNN
 """
 )
 
-def KNN( k, trainSet, testSet, log=sys.stdout ) :
+class KNN(o) :
+  def __init__( i, trainSet ) : 
+    super( KNN, i).__init__()
 
-  #Cusomize the output streams
-  out = XStream( sys.stdout, auto_flush=True, color="w" )
-  err = XStream( sys.stderr, auto_flush=True, color="r" )
-  
-  k   = int(k)
-  tab = Reader( trainSet ).table()
-  trn = tab.sample(100)
-  tst = tab.sample(100)
+    i.algorithm    = "KNN"
+    i.set     = trainSet if isinstance( trainSet, Table ) else Reader( trainSet ).table()
+    i.size    = len( i.set )
+    i.time = 0
 
-  out( "Training : \n" ) 
-  out( "  K Nghbrs : " + cstr( k, "b" ) + "\n")
-  out( "  trainSet : " + cstr( trainSet, "b" ) + "\n")
-  out( "  testSet  : " + cstr( testSet, "b" ) + "\n") 
-        
-  t0 = clock() #python on windows needs to use clock, 
-               #since the system clock is different. 
-               #clock on *nix seems to work fine, so clock seems to be
-               # more portable in general. 
-  t1 = clock()
-  out( "\n  Done!\n" ) 
-  out( "\n  Time elpased : " + cstr( t1 - t0 , "b" ) + "\n\n" ) 
-  out( "\nTesting : " )
+  def test(i, k, testSet ) :
 
-  t0 = clock()
-  rslt = [ ( x, trn.closest(x, n=k)) for x in tst ]
-  t1 = clock()
-  out( "  Time elapsed : " + cstr( t1 - t0, "b" ) + "\n" )
+    testObj   = o()
+    testObj.k = k
 
-  print_results( trn, rslt, stream=out )
+    if not isinstance( testSet, Table ):
+      testObj.set = Reader(testSet).table()
+    else : 
+      testObj.set = testSet
+
+    testObj.size = len( testObj.set )
+
+    t0 = clock()
+    rslt = [ ( x, i.set.closest(x, n=testObj.k)) for x in testObj.set ]
+    t1 = clock()
+
+    testObj.time = t1 - t0
+
+    return ResultSet( i, testObj, rslt )
+   
 
 if __name__ == '__main__' : 
   try : 
     k   = int( sys.argv[1] )       
-    trn = sys.argv[2]       
-    tst = sys.argv[3] 
+    trn = Reader(sys.argv[2]).table().sample(100)
+    tst = Reader(sys.argv[3]).table().sample(100)
   except : 
     sys.stderr.write( cstr(" Illegal Arguments\n greater than", "r") )
     sys.stderr.write( __DOC__ )
     exit(1)
 
-  KNN( k, trn, tst ) 
+  test = KNN( trn )
+  resl = test.test( k, tst )
+  print( resl.info() ) 
 
       
   

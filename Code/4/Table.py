@@ -178,7 +178,6 @@ class Table(Vector):
   def sort( **kwargs ) : 
      i.data.sort( **kwargs ) 
     
-
   def copy( i ) :
      return i.__class__( i, header=i.header, shallowCopy=True )
   def deepcopy( i ) :
@@ -298,14 +297,14 @@ class Table(Vector):
     return "\n".join([ str(x) for x in i.data])
 
   def __repr__( i ) : 
-    return i.__str__()
-
-  def __str__( i ) : 
     return (
       "Table(" + str(i.id) + ")\n" +
       "  Row count : "+str(i.rowCount) + "\n\n"+
       "\n".join([ str(x) for x in i.header ])
     )
+
+  def __str__( i ) :
+    return "Table(" + str(i.id) + ")"
     
 
 class Header(Vector) : 

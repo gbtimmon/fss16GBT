@@ -1,9 +1,9 @@
 from __future__   import division, print_function
 from Table        import Table, Reader
-from XStream      import XStream, cstr
+from O            import o 
 from math         import floor
 from time         import clock
-from PrintResults import print_results
+from ResultSet    import ResultSet
 import sys
 
 __DOC__=(
@@ -38,57 +38,60 @@ MiniBatch KMeans
 """
 )
 
-def MiniBatchKNN( nClusters, bSize, iters, kNN, trainSet, testSet, log=sys.stdout ) :
+class MiniBatch(o) :
+  def __init__(self, trainSet, nClusters, bSize, iters ):
+    super(MiniBatch, self).__init__()
+    self.algorithm  = "MiniBatch"
+    self.clusterCnt = k = int(nClusters)
+    self.batchSize  = b = int(bSize)
+    self.iterCount  = t = int(iters)
 
-  #Cusomize the output streams
-  out = XStream( sys.stdout, auto_flush=True, color="w" )
-  err = XStream( sys.stderr, auto_flush=True, color="r" )
-  
-  k   = int(nClusters)
-  b   = int(bSize)
-  t   = int(iters)
-  knn = int(kNN)
-  tab = Reader( trainSet ).table()
-  trn = tab.sample(1000)
-  tst = tab.sample(1000)
+    if not isinstance( trainSet, Table ) :  
+      trainSet = Reader( trainSet ).table()
+      
+    self.set = trainSet
+    self.size = len(trainSet)
 
-  out( "Training : \n" ) 
-  out( "  Clusters : " + cstr( k, "b" ) + "\n")
-  out( "  Batch Sz : " + cstr( b, "b" ) + "\n")
-  out( "  Iter Cnt : " + cstr( t, "b" ) + "\n")
-  out( "  K Nghbrs : " + cstr( knn, "b" ) + "\n")
-  out( "  trainSet : " + cstr( trainSet, "b" ) + "\n")
-  out( "  testSet  : " + cstr( testSet, "b" ) + "\n") 
         
-  t0 = clock() #python on windows needs to use clock, 
+    t0 = clock() #python on windows needs to use clock, 
                #since the system clock is different. 
                #clock on *nix seems to work fine, so clock seems to be
                # more portable in general. 
 
-  C = trn.sample( k, shallowCopy=False )   # 0. initial random centers
-  V = [0] * len(C)                         # 1. size of the current cluster
-  for i in xrange( t ) :                   # 2. for all iters
-    p = int(i/t * 50) + 1                  # _. show the percent complete. 
-    out("\r  [" + ( "#" * p ) + ("-" * (50-p)) + "]", color="b" )
-    M = trn.sample( b )                    # 3. random samples from data set  
-    D = [ C.closesti( k ) for k in M ]    # 4. closest center of each sample
+    self._C = self.set.sample( k, shallowCopy=False )# 0. initial random centers
+    V = [0] * len(self._C)                         # 1. size of the current cluster
+    for i in xrange( t ) :                      # 2. for all iters
+      p = int(i/t * 50) + 1                     # _. show the percent complete. 
+      M = self.set.sample( b )                       # 3. random samples from data set  
+      D = [ self._C.closesti( k ) for k in M ]  # 4. closest center of each sample
     
-    for x,c in zip(M,D) :                  # 5,6. for each sample and closest center
-      if isinstance( c, list) : c = c[0]   # if I got more than one center
-      c=c[0]
-      V[c] += 1                            # 7. grow the center
-      C.blendRow(c, x, 1/V[c] )            # 8,9. blend the center
+      for x,c in zip(M,D) :                     # 5,6. for each sample and closest center
+        if isinstance( c, list) : c = c[0]      # if I got more than one center
+        c=c[0]
+        V[c] += 1                               # 7. grow the center
+        self._C.blendRow(c, x, 1/V[c] )         # 8,9. blend the center
 
-  t1 = clock()
-  out( "\n  Done!\n" ) 
-  out( "\n  Time elpased : " + cstr( t1 - t0 , "b" ) + "\n\n" ) 
-  out( "\nTesting : " )
-  t0 = clock()
-  rslt = [ ( x, C.closest(x) ) for x in tst ]
-  t1 = clock() 
-  out( "  Time elapsed : " + cstr( t1 - t0, "b" ) + "\n" )
+    t1 = clock()
+
+    self.time = t1 - t0
+
+  def test(self, testSet, k ):
+    
+    if not isinstance( testSet, Table ) :
+      testSet = Reader( testSet ).table()
+
+    t0 = clock()
+    rslt = [ ( x, self._C.closest(x) ) for x in testSet ]
+    t1 = clock() 
+
+    testObj = o()
+    testObj.set  = testSet
+    testObj.size = len( testSet ) 
+    testObj.time = t1 - t0
+    testObj.knn      = k
+   
+    return ResultSet( self, testObj, rslt )
  
-  print_results( C, rslt)
   
 if __name__ == '__main__' : 
   try : 
@@ -103,7 +106,14 @@ if __name__ == '__main__' :
     sys.stderr.write( __DOC__ )
     exit(1)
 
-  MiniBatchKNN( k, b, t, knn, trn, tst ) 
+  trn = Reader( trn ).table().sample(100)
+  tst = Reader( tst ).table().sample(100)
+
+  mt = MiniBatchKNN( trn, k, b, t )
+  rs = mt.test( tst, knn )
+
+  print(rs)
+  print(rs.info())
 
       
   

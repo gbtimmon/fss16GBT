@@ -1,6 +1,8 @@
 from __future__ import print_function
 from Table import Table, Reader
+from O import o 
 from time import clock
+from ResultSet import ResultSet
 import collections 
 __DOC__=(
 """
@@ -15,26 +17,32 @@ class Node () :
   def __init__(i): 
     i.row, i.index, i.left, i.right = None, None, None, None
 
-class KDTree( ) : 
+class KDTree(o) : 
 
   def __init__( i, table, shallowCopy=False ) : 
 
-    i.table = table.copy() if shallowCopy else table.deepcopy()
-    i.header = i.table.header
-      
-    i.iv    = [ x for x in i.header if not x.isDep() ]
-    i.c_iv  = -1 
+    super( KDTree, i).__init__()
 
-    def next_var( ) : 
-      i.c_iv = (i.c_iv + 1) % len(i.iv)
-      return i.iv[i.c_iv]
+    i.algorithm = "KDTree" 
+    if not isinstance( table, Table) :
+       table = Reader( table ).table()
 
-    i.tree = Node() 
-    worklist = [ (i.tree, table)  ]
+    i.set  = table.copy() if shallowCopy else table.deepcopy()
+    i.size = len( i.set )
+
+    cols    = [ x for x in i.set.header if not x.isDep() ]
+    cur_col = -1 
+
+    i._tree = Node() 
+
+    t0 = clock()
+    worklist = [ (i._tree, table)  ]
     new_worklist = []
 
     while worklist :
-      var = next_var()
+      cur_col = (cur_col + 1 ) % len( cols)
+      var = cols[cur_col]
+
       for t in worklist : 
         t[1].sort( key= lambda	r: r[var.pos] )
         median_idx = len(t[1]) // 2 
@@ -42,7 +50,7 @@ class KDTree( ) :
         rght_table = t[1][median_idx+1:]
         
         t[0].row   = t[1][median_idx]
-        t[0].index = i.c_iv
+        t[0].index = cur_col
         
         if( len(left_table) > 0 ) :
           t[0].left = Node()
@@ -55,15 +63,17 @@ class KDTree( ) :
       worklist = new_worklist
       new_worklist = []
     
+    t1 = clock()
+    i.time = t1 - t0
         
   def nn( i, dest ) : 
     best_row  = None
     best_dist = float('inf')
     
-    worklist = [i.tree]
+    worklist = [i._tree]
     while worklist :
       node = worklist.pop()
-      dist = i.table.dist( dest, node.row )
+      dist = i.set.dist( dest, node.row )
       if( dist < best_dist ) :
         best_row = node.row
         best_dist = dist
@@ -77,6 +87,21 @@ class KDTree( ) :
         worklist.append( away  ) 
   
     return best_row, best_dist
+
+  def test( i, test ) :
+    if not isinstance( test, Table ) : 
+      test = Reader( table ).table()
+
+    t0 = clock()
+    rslt = [( x, i.nn( x )[0]) for x in test ]
+    t1 = clock()
+
+    testObj = o()
+    testObj.set = test
+    testObj.size = len(test)
+    testObj.time = t1 - t0 
+
+    return ResultSet( i, testObj, rslt )
     
 if __name__ == '__main__' : 
   import sys 
@@ -87,17 +112,11 @@ if __name__ == '__main__' :
   train = sys.argv[1]
   test  = sys.argv[2]
   
-  tab = Reader(train).table().sample(1000)
-  t0 = clock()
-  tre = KDTree( tab )
-  t1 = clock()
-  print("Training Time : ", str( t1 - t0 ) )
- 
-  test = Reader( test ).table().sample(1000)
+  tab = Reader(train).table().sample(100)
+  test = Reader( test ).table().sample(100)
 
-  results = []
-  t0 = clock()
-  for i in test : 
-    nn =  tre.nn(i) 
-  t1 = clock()
-  print("Testing Time : ", str( t1 - t0 ) )
+  t = KDTree( tab )
+  r = t.test( test )
+
+  print( r ) 
+  print( r.info() )

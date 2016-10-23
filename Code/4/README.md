@@ -9,14 +9,29 @@ i Homework 4 : KD-Trees and Mini batch K means.
 
 ## Runtime comparison
 
-Sample runs were run on Diabetes10000.csv from ninja 
-Training was performed on 10000 row and training was tested on another 10000 rows. 
-Time for loading table is not considered part of training - as a consequence KNN has no training time. 
+Samples runs were run on diabetes100000.csv from the ninja datasets. 
+A random sample fo the specified size was takes for each test. 
+Each test is run 5 times and the median result was reported below. 
+Sets of size 250, 500, 1000 and 2000 were tested. 
 
-| Algorithm         | Train Time    | Test Time | Output | 
-| ----------------- |:-------------:| ---------:| ------------ |
-| KNN               | 0.0 sec | 3877.9398 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KNN.output) |
-| Mini Batch KMeans | 175.23852 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/MiniBatchKMeans.output) |
-| KD-Tree           | 175.23852 sec | 3.78731 sec | [output](https://github.com/gbtimmon/fss16_teamf/blob/master/Code/4/KDTree.output) |
+With 250 rows :
+            KNN -> Training Time :   0.0000, Testing Time :   1.8238
+         KDTree -> Training Time :   0.0518, Testing Time :   0.0838
+      MiniBatch -> Training Time :   0.3707, Testing Time :   0.3577
+
+With 500 rows : 
+            KNN -> Training Time :   0.0000, Testing Time :   7.6799
+         KDTree -> Training Time :   0.1333, Testing Time :   0.2168
+      MiniBatch -> Training Time :   0.8090, Testing Time :   0.7939
+
+With 1000 rows :
+            KNN -> Training Time :   0.0000, Testing Time :  32.5580
+         KDTree -> Training Time :   0.3100, Testing Time :   0.5443
+      MiniBatch -> Training Time :   1.6013, Testing Time :   1.5249
+
+With 2000 rows : 
+            KNN -> Training Time :   0.0000, Testing Time : 156.3769
+         KDTree -> Training Time :   0.8651, Testing Time :   1.7281
+      MiniBatch -> Training Time :   4.2436, Testing Time :   4.1740
 
 
