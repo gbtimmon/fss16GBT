@@ -1,95 +1,103 @@
-import collections
-import itertools
-import math
+from __future__ import print_function
+from Table import Table, Reader
+from time import clock
+import collections 
+__DOC__=(
+"""
+   KDTree
 
-def square_distance(a, b):
-    s = 0
-    for x, y in itertools.izip(a, b):
-        d = x - y
-        s += d * d
-    return s
+   @1    training inputs
+   @2    testing inputs
+"""
+)
 
-Node = collections.namedtuple("Node", 'point axis label left right')
+class Node () : 
+  def __init__(i): 
+    i.row, i.index, i.left, i.right = None, None, None, None
 
-class KDTree(object):
-    """A tree for nearest neighbor search in a k-dimensional space.
+class KDTree( ) : 
 
-    For information about the implementation, see
-    http://en.wikipedia.org/wiki/Kd-tree
+  def __init__( i, table, shallowCopy=False ) : 
 
-    Usage:
-    objects is an iterable of (point, label) tuples
-    k is the number of dimensions
-    
-    t = KDTree(k, objects)
-    point, label, distance = t.nearest_neighbor(destination)
-    """
+    i.table = table.copy() if shallowCopy else table.deepcopy()
+    i.header = i.table.header
+      
+    i.iv    = [ x for x in i.header if not x.isDep() ]
+    i.c_iv  = -1 
 
-    def __init__(self, k, objects=[]):
+    def next_var( ) : 
+      i.c_iv = (i.c_iv + 1) % len(i.iv)
+      return i.iv[i.c_iv]
 
-        def build_tree(objects, axis=0):
+    i.tree = Node() 
+    worklist = [ (i.tree, table)  ]
+    new_worklist = []
 
-            if not objects:
-                return None
-
-            objects.sort(key=lambda o: o[0][axis])
-            median_idx = len(objects) // 2
-            median_point, median_label = objects[median_idx]
-
-            next_axis = (axis + 1) % k
-            return Node(median_point, axis, median_label,
-                        build_tree(objects[:median_idx], next_axis),
-                        build_tree(objects[median_idx + 1:], next_axis))
-
-        self.root = build_tree(list(objects))
-
-
-    def nearest_neighbor(self, destination):
-
-        best = [None, None, float('inf')]
-        # state of search: best point found, its label,
-        # lowest squared distance
-
-        def recursive_search(here):
-
-            if here is None:
-                return
-            point, axis, label, left, right = here
-
-            here_sd = square_distance(point, destination)
-            if here_sd < best[2]:
-                best[:] = point, label, here_sd
-
-            diff = destination[axis] - point[axis]
-            close, away = (left, right) if diff <= 0 else (right, left)
-
-            recursive_search(close)
-            if diff ** 2 < best[2]:
-                recursive_search(away)
-
-        recursive_search(self.root)
-        return best[0], best[1], math.sqrt(best[2])
-
-if __name__ == '__main__':
-
-    from random import random
-    
-    k = 5
-    npoints = 1000
-    lookups = 1000
-    eps = 1e-8
-    
-    tab = CSVReader( sys.argv[1] ).table()
-
-    points = [(tuple(random() for _ in xrange(k)), i)
-              for i in xrange(npoints)]
-
-    tree = KDTree(k, points)
-
-    for _ in xrange(lookups):
+    while worklist :
+      var = next_var()
+      for t in worklist : 
+        t[1].sort( key= lambda	r: r[var.pos] )
+        median_idx = len(t[1]) // 2 
+        left_table = t[1][:median_idx]
+        rght_table = t[1][median_idx+1:]
         
-        destination = [random() for _ in xrange(k)]
-        _, _, mindistance = tree.nearest_neighbor(destination)
+        t[0].row   = t[1][median_idx]
+        t[0].index = i.c_iv
         
-        minsq = min(square_distance(p, destination) for p, _ in points)
-        assert abs(math.sqrt(minsq) - mindistance) < eps
+        if( len(left_table) > 0 ) :
+          t[0].left = Node()
+          new_worklist.append( (t[0].left, left_table) )
+
+        if( len(rght_table) > 0 ) :
+          t[0].right = Node()
+          new_worklist.append( (t[0].right, rght_table) )
+
+      worklist = new_worklist
+      new_worklist = []
+    
+        
+  def nn( i, dest ) : 
+    best_row  = None
+    best_dist = float('inf')
+    
+    worklist = [i.tree]
+    while worklist :
+      node = worklist.pop()
+      dist = i.table.dist( dest, node.row )
+      if( dist < best_dist ) :
+        best_row = node.row
+        best_dist = dist
+
+      diff = dest[node.index] - node.row[node.index]
+      close, away = (node.left, node.right) if diff <= 0 else (node.right, node.left)
+
+      if close :
+        worklist.append( close )
+      if away and (diff**2 < best_dist ) :
+        worklist.append( away  ) 
+  
+    return best_row, best_dist
+    
+if __name__ == '__main__' : 
+  import sys 
+
+  if( len(sys.argv) < 3 ) :   
+    print( __DOC__ )
+    exit(1)   
+  train = sys.argv[1]
+  test  = sys.argv[2]
+  
+  tab = Reader(train).table().sample(1000)
+  t0 = clock()
+  tre = KDTree( tab )
+  t1 = clock()
+  print("Training Time : ", str( t1 - t0 ) )
+ 
+  test = Reader( test ).table().sample(1000)
+
+  results = []
+  t0 = clock()
+  for i in test : 
+    nn =  tre.nn(i) 
+  t1 = clock()
+  print("Testing Time : ", str( t1 - t0 ) )

@@ -31,7 +31,7 @@ class cache():
     return i.val
 
 
-class Vector : 
+class Vector(object) : 
   """
   Vector class add a standard interface to data objects which are 
   wrappers for any list of data. Just as a sub set of a list returns a 
@@ -170,15 +170,33 @@ class Table(Vector):
         i.data.append( x.copy() )
  
   def __getitem__( i, x ) : 
-    if( isinstance(x, int) ):
-       return Vector.__getitem__(i, x) 
-    if ( isinstance( x, tuple ) or isinstance( x, list ) ) : 
-       return Table( [ i[y] for y in x ], header=i.colNames() )
+    if isinstance(x, slice) :
+      return Table( i.data[x], header=i.header, shallowCopy=True)
+    else :
+      return i.data[x]
+  
+  def sort( **kwargs ) : 
+     i.data.sort( **kwargs ) 
+    
 
   def copy( i ) :
      return i.__class__( i, header=i.header, shallowCopy=True )
   def deepcopy( i ) :
      return i.__class__( i, header=i.header, shallowCopy=False )
+
+  def filter(i, lam ) : 
+    yes = []
+    no  = []
+    for r in i :
+      if( lam(r) ):
+        yes.append( r ) 
+      else :
+        no.append( r )
+ 
+    return ( Table( yes, header=i.header, shallowCopy=True ),
+             Table( no,  header=i.header, shallowCopy=False) )
+      
+      
 
   def furthesti( i, x, n=1 ) : 
     arr = i.dist(x)
@@ -194,7 +212,11 @@ class Table(Vector):
     return arr[:n]
   
   def closest( i, x, n=1 ) :
-    return i[ [ x[0] for x in i.closesti(x, n=n) ] ] 
+    if n == 1 :
+      return i[ i.closesti(x, n=n)[0][0] ]
+    else :
+      return [ i[x[0][0]] for x in i.closesti(x,n=n) ]
+    
 
   def knn(i, row, n=1 ) :
     nn = map( tuple, i.closest( row, n=n ).getDependent() ) 
@@ -262,9 +284,12 @@ class Table(Vector):
     data = [ [ j[x] for x in index ] for j in i ]
     return Table( data, header=head ) 
   
-  """DEPRECATE?! """  
   def getDependentValues( i , x ) :
     return [ x[y] for y in xrange(len(i.header)) if i.header[y].isDep() ] 
+
+  def sort(i, **kwargs  ) : 
+    return i.data.sort( **kwargs ) 
+    
 
   def colNames( i ) :
     return [str(x.name) for x in i.header ]
@@ -295,7 +320,7 @@ class Header(Vector) :
     return str([ str(x) for x in i.data ])
  
 
-class _Header:
+class _Header():
 
   def isDep( i )      : return i.dep
   def norm( i, x )    : return i.stat.norm( x )
@@ -303,6 +328,9 @@ class _Header:
   def furthest( i, x ): return i.stat.furthest( x ) 
 
   def __init__ ( i, name, pos) : 
+    if( isinstance( name, _Header) ):
+      name = name.name #lol
+
     i.pos  = pos
     i.dep  = True if( name[0] == "=" ) else False
     i.stat = None

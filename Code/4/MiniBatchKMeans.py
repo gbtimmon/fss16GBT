@@ -1,8 +1,9 @@
-from __future__  import division, print_function
-from Table       import Table, Reader
-from XStream     import XStream, cstr
-from math        import floor
-from time        import clock
+from __future__   import division, print_function
+from Table        import Table, Reader
+from XStream      import XStream, cstr
+from math         import floor
+from time         import clock
+from PrintResults import print_results
 import sys
 
 __DOC__=(
@@ -48,8 +49,8 @@ def MiniBatchKNN( nClusters, bSize, iters, kNN, trainSet, testSet, log=sys.stdou
   t   = int(iters)
   knn = int(kNN)
   tab = Reader( trainSet ).table()
-  trn = tab.sample(10000)
-  tst = tab.sample(10000)
+  trn = tab.sample(1000)
+  tst = tab.sample(1000)
 
   out( "Training : \n" ) 
   out( "  Clusters : " + cstr( k, "b" ) + "\n")
@@ -82,36 +83,13 @@ def MiniBatchKNN( nClusters, bSize, iters, kNN, trainSet, testSet, log=sys.stdou
   out( "\n  Done!\n" ) 
   out( "\n  Time elpased : " + cstr( t1 - t0 , "b" ) + "\n\n" ) 
   out( "\nTesting : " )
-
-  out("=== Predictions on test data ===\n\n")
-  out(" inst#     actual  predicted error prediction\n")
-
-  value_count = 1
-  line_number = 1
-  value_map   = {}
-
   t0 = clock()
-  for row in tst : 
-    closest = C.closest( row )[0]
-    pred = tuple(C.getDependentValues( closest ))
-    expt = tuple(C.getDependentValues( row     ))
-
-    if pred not in value_map :
-      value_map[ pred ] = value_count
-      value_count += 1
-
-    if expt not in value_map : 
-      value_map[expt] = value_count
-      value_count +=1
-
-    preds = str( value_map[ pred ] )
-    expts = str( value_map[ expt ] ) 
-    reslt = "1" if pred == expt else "0"
-
-    out.write( "%5s %5s %5s %1s\n" % ( line_number, expts, preds, reslt ) )
+  rslt = [ ( x, C.closest(x) ) for x in tst ]
   t1 = clock() 
- 
   out( "  Time elapsed : " + cstr( t1 - t0, "b" ) + "\n" )
+ 
+  print_results( C, rslt)
+  
 if __name__ == '__main__' : 
   try : 
     k   = int( sys.argv[1] )       

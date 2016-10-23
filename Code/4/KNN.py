@@ -1,8 +1,9 @@
-from __future__  import division, print_function
-from Table       import Table, Reader
-from XStream     import XStream, cstr
-from math        import floor
-from time        import clock
+from __future__   import division, print_function
+from Table        import Table, Reader
+from XStream      import XStream, cstr
+from math         import floor
+from time         import clock
+from PrintResults import print_results
 import sys
 
 __DOC__=(
@@ -19,16 +20,16 @@ KNN
 """
 )
 
-def KNN( nClusters, trainSet, testSet, log=sys.stdout ) :
+def KNN( k, trainSet, testSet, log=sys.stdout ) :
 
   #Cusomize the output streams
   out = XStream( sys.stdout, auto_flush=True, color="w" )
   err = XStream( sys.stderr, auto_flush=True, color="r" )
   
-  k   = int(nClusters)
+  k   = int(k)
   tab = Reader( trainSet ).table()
-  trn = tab.sample(10000)
-  tst = tab.sample(10000)
+  trn = tab.sample(100)
+  tst = tab.sample(100)
 
   out( "Training : \n" ) 
   out( "  K Nghbrs : " + cstr( k, "b" ) + "\n")
@@ -44,35 +45,13 @@ def KNN( nClusters, trainSet, testSet, log=sys.stdout ) :
   out( "\n  Time elpased : " + cstr( t1 - t0 , "b" ) + "\n\n" ) 
   out( "\nTesting : " )
 
-  out("=== Predictions on test data ===\n\n")
-  out(" inst#     actual  predicted error prediction\n")
-
-  value_count = 1
-  line_number = 1
-  value_map   = {}
-
   t0 = clock()
-  for row in tst : 
-    closest = trn.closest( row, n=1 )[0]
-    pred = tuple(trn.getDependentValues( closest ))
-    expt = tuple(trn.getDependentValues( row     ))
-
-    if pred not in value_map :
-      value_map[ pred ] = value_count
-      value_count += 1
-
-    if expt not in value_map : 
-      value_map[expt] = value_count
-      value_count +=1
-
-    preds = str( value_map[ pred ] )
-    expts = str( value_map[ expt ] ) 
-    reslt = "1" if pred == expt else "0"
-
-    out.write( "%5s %5s %5s %1s\n" % ( line_number, expts, preds, reslt ) )
-  t1 = clock() 
- 
+  rslt = [ ( x, trn.closest(x, n=k)) for x in tst ]
+  t1 = clock()
   out( "  Time elapsed : " + cstr( t1 - t0, "b" ) + "\n" )
+
+  print_results( trn, rslt, stream=out )
+
 if __name__ == '__main__' : 
   try : 
     k   = int( sys.argv[1] )       

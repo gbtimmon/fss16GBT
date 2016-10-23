@@ -2,5 +2,9 @@ from __future__ import print_function
 from Table import Table, Reader
 
 tab = Reader( "../../../ninja/data/weather.csv" ).table()
+ 
+print( *tab, sep="\n" ) 
 
-print( *tab.knn(3,n=4), sep="\n" )
+tab.sort( key=lambda x : x[4])
+
+print( *tab, sep="\n" ) 
