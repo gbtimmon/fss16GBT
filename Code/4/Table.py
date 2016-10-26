@@ -168,6 +168,18 @@ class Table(Vector):
         i.data.append(x)
       else :
         i.data.append( x.copy() )
+
+  def __call__( i, ele, shallowCopy=True ) : 
+
+    if isinstance( ele, Table ) :
+      for r in ele : i( r, shallowCopy= shallowCopy )
+    else :
+      i.rowCount += 1
+      i.header.add( ele ) 
+      if shallowCopy :      
+        i.data.append( ele)
+      else:
+        i.data.append( ele.copy() )
  
   def __getitem__( i, x ) : 
     if isinstance(x, slice) :
@@ -183,19 +195,17 @@ class Table(Vector):
   def deepcopy( i ) :
      return i.__class__( i, header=i.header, shallowCopy=False )
 
-  def filter(i, lam ) : 
+  def filter(i, lam , shallowCopy=True) : 
     yes = []
     no  = []
-    for r in i :
-      if( lam(r) ):
-        yes.append( r ) 
+    for a,b in enumerate(i) :
+      if( lam(a,b) ):
+        yes.append( b ) 
       else :
-        no.append( r )
+        no.append( b )
  
-    return ( Table( yes, header=i.header, shallowCopy=True ),
-             Table( no,  header=i.header, shallowCopy=False) )
-      
-      
+    return ( Table( yes, header=i.header, shallowCopy=shallowCopy ),
+             Table( no,  header=i.header, shallowCopy=shallowCopy ) )
 
   def furthesti( i, x, n=1 ) : 
     arr = i.dist(x)
@@ -216,11 +226,9 @@ class Table(Vector):
     else :
       return [ i[x[0][0]] for x in i.closesti(x,n=n) ]
     
-
   def knn(i, row, n=1 ) :
     nn = map( tuple, i.closest( row, n=n ).getDependent() ) 
     return  Counter(nn).most_common(1)[0] 
-    
 
   def dist( i, a, b=None, f=2 ) :
     def _dist( i, a, b, f=f ) :
@@ -270,12 +278,53 @@ class Table(Vector):
       if not i.header[x].isDep() :
         into[x] = ((1-rate)*into[x]) + (rate*frm[x])
 
-  def oneHot( i ) :
+  def oneHot( i, limit=5) :
     """ 
        Generate a one hot version of a table
        good for clustering symbolic data. 
     """
-    pass
+    count_lists = [ h.stat.counts if isinstance(h.stat, Sym) and not h.isDep() else None for h in i.header ] 
+
+    idx = 0 
+    pos_map  = []
+    new_head = []
+    for x,y in zip(count_lists, i.header ) : 
+      if x is None : 
+        pos_map.append(idx)
+        new_head.append(y.name)
+        idx += 1
+      else : 
+        d = dict()
+        keys = x.keys()
+        if( len(keys) > 5 ) : 
+          sys.stderr.write("One hot would produce to many columns (limit set to %d). Exiting"%(limit))
+          sys.exit(1)
+        for k in x.keys() :
+          new_head.append( y.name +"_is" + k )
+          d[k] = idx
+          idx += 1
+        pos_map.append( d ) 
+
+    new_table = Table([], header=new_head, shallowCopy=False)
+
+    for row in i :
+      new_row = [0] * idx
+      for col,pmap in zip( row, pos_map ):
+        if isinstance( pmap, int ) :
+          new_row[pmap] = col
+        else :
+          new_row[pmap[col]] = 1
+      new_table( Row( new_row ) )
+
+    return new_table
+      
+
+      
+    
+       
+        
+      
+    
 
   def getDependent( i ) : 
     index = [ x for x in xrange(len(i.header)) if i.header[x].isDep() ] 
@@ -399,7 +448,7 @@ class Sym():
     return (("SYM ENT : %5.4f  MOST : %5s  MODE : %-20s") % ( i.ent(), str(i.most),  str(i.mode)))
 
   def __init__( i ):
-     i.counts, i.most, i.mode, i.n = {},0,None,0
+    i.counts, i.most, i.mode, i.n = {},0,None,0
 
   def add(i,x):
     i.n += 1
