@@ -41,14 +41,12 @@ class ResultSet(o) :
       if row.expected != self.minority and row.predicted != self.minority : self.metric.TN += 1
 
     m = self.metric
-    m.tpr        = m.FP / (m.TP + m.FN + self._eps )
-    m.tnr        = m.TN / (m.TN + m.FP + self._eps )
-    m.precision  = m.TP / (m.TP + m.FP + self._eps )
-    m.fpr        = m.FP / (m.TN + m.FP + self._eps )
-    m.fdr        = m.FP / (m.FP + m.TP + self._eps )
-    m.fnr        = m.FN / (m.FN + m.TP + self._eps )
-    m.accuracy   = (m.TP + m.TN) / (m.TP + m.TN + m.FN + m.FP + self._eps )
-    m.f1         = ( 2 * m.TP )  / ( ( 2 * m.TP ) + m.FP + m.FN + self._eps )
+    m.recall      = m.TP / (m.TP + m.FN + self._eps )
+    m.specificity = m.TN / (m.TN + m.FP + self._eps )
+    m.precision   = m.TP / (m.TP + m.FP + self._eps )
+    m.falsealarm  = m.FP / (m.TN + m.FP + self._eps )
+    m.accuracy    = (m.TP + m.TN) / (m.TP + m.TN + m.FN + m.FP + self._eps )
+    m.f1          = ( 2 * m.TP )  / ( ( 2 * m.TP ) + m.FP + m.FN + self._eps )
 
   def info( self ) : 
 
@@ -71,7 +69,7 @@ class ResultSet(o) :
     ss += "\n    Prd F | %5d | %5d  " %(self.metric.FN, self.metric.TN) 
     ss += "\n"
     ss += "\n    Metrics"
-    ss += "\n".join(["    %10s = %d"%(str(k), int(v)) for k,v in self.metric.iteritems() if str(k) not in ["TP", "TN", "FP", "FN"]])   
+    ss += "\n".join(["    %10s = %4.3f"%(str(k), float(v)) for k,v in self.metric.iteritems() if str(k) not in ["TP", "TN", "FP", "FN"]])   
     return ss
 
   def __str__( self ) : 
