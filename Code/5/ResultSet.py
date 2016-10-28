@@ -1,3 +1,4 @@
+from __future__ import division
 import sys
 from O import o 
 
@@ -9,12 +10,13 @@ class ResultSet(o) :
     self.values   = {}
     self.result   = []
     self.sformat  = "{:5} " * 4
-    self.metrics  = o(TP=0, TN=0, FP=0, FN=0)
+    self.metric   = o(TP=0, TN=0, FP=0, FN=0)
+    self._eps     = 10e-40
 
     cur_val  = 1
     for i, tup in enumerate(results) :
       ex = tuple( self.test.set.getDependentValues( tup[0] ) )
-      pd = tuple( self.test.set.getDependentValues( tup[1] ) )
+      pd = tuple( tup[1] )
       rs = "1" if ex == pd else "0"
  
       for it in [ex, pd] :
@@ -33,12 +35,18 @@ class ResultSet(o) :
     self.minority = min([(k,v) for k,v in self.values.iteritems() ], key=lambda x: x[1].count_exp )[0]
     
     for row in self.result : 
-      if row.expected == self.minority and row.predicted == self.minority : self.metrics.TP += 1
-      if row.expected == self.minority and row.predicted != self.minority : self.metrics.FN += 1
-      if row.expected != self.minority and row.predicted == self.minority : self.metrics.FP += 1
-      if row.expected != self.minority and row.predicted != self.minority : self.metrics.TN += 1
- 
-      
+      if row.expected == self.minority and row.predicted == self.minority : self.metric.TP += 1
+      if row.expected == self.minority and row.predicted != self.minority : self.metric.FN += 1
+      if row.expected != self.minority and row.predicted == self.minority : self.metric.FP += 1
+      if row.expected != self.minority and row.predicted != self.minority : self.metric.TN += 1
+
+    m = self.metric
+    m.recall      = m.TP / (m.TP + m.FN + self._eps )
+    m.specificity = m.TN / (m.TN + m.FP + self._eps )
+    m.precision   = m.TP / (m.TP + m.FP + self._eps )
+    m.falsealarm  = m.FP / (m.TN + m.FP + self._eps )
+    m.accuracy    = (m.TP + m.TN) / (m.TP + m.TN + m.FN + m.FP + self._eps )
+    m.f1          = ( 2 * m.TP )  / ( ( 2 * m.TP ) + m.FP + m.FN + self._eps )
 
   def info( self ) : 
 
@@ -57,8 +65,11 @@ class ResultSet(o) :
     ss += "\n"
     ss += "\n          | Exp T | Exp F"
     ss += "\n    ----- + ----- + -----"
-    ss += "\n    Prd T | %5d | %5d  " %(self.metrics.TP, self.metrics.FP) 
-    ss += "\n    Prd F | %5d | %5d  " %(self.metrics.FN, self.metrics.TN) 
+    ss += "\n    Prd T | %5d | %5d  " %(self.metric.TP, self.metric.FP) 
+    ss += "\n    Prd F | %5d | %5d  " %(self.metric.FN, self.metric.TN) 
+    ss += "\n"
+    ss += "\nMetrics\n"
+    ss += "\n".join(["    %-11s = %4.3f"%(str(k), float(v)) for k,v in self.metric.iteritems() if str(k) not in ["TP", "TN", "FP", "FN"]])   
     return ss
 
   def __str__( self ) : 
@@ -67,5 +78,4 @@ class ResultSet(o) :
     ss += "\n"
     ss += "Test# Expct Prdct Reslt\n"
     ss += "\n".join( [ self.sformat.format(x.result, x.expected, x.predicted, x.result) for x in self.result ] ) +"\n"
-
     return ss
