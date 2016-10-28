@@ -181,6 +181,9 @@ class Table(Vector):
       else:
         i.data.append( ele.copy() )
  
+  def add( i, table ) : 
+    for r in table: i( r )
+    
   def __getitem__( i, x ) : 
     if isinstance(x, slice) :
       return Table( i.data[x], header=i.header, shallowCopy=True)
@@ -190,8 +193,12 @@ class Table(Vector):
   def sort( **kwargs ) : 
      i.data.sort( **kwargs ) 
     
-  def copy( i ) :
-     return i.__class__( i, header=i.header, shallowCopy=True )
+  def copy( i, shallowCopy=False) :
+     if shallowCopy :
+       return i.__class__( i, header=i.header, shallowCopy=True )
+     else :
+       return i.deepcopy()
+
   def deepcopy( i ) :
      return i.__class__( i, header=i.header, shallowCopy=False )
 
@@ -270,7 +277,11 @@ class Table(Vector):
       if n > 1 or n < 0 : 
         raise TypeError("percent out of bounds")
       n = len(i) * n
-    return Table( random.sample(i, n), header=i.colNames(), shallowCopy=shallowCopy )
+      
+    if n > len(i):
+      return i.copy( shallowCopy=shallowCopy ) 
+    else :
+      return Table( random.sample(i, n), header=i.colNames(), shallowCopy=shallowCopy )
 
   def blendRow(i, into, frm, rate ) :
     if isinstance( into, int ) : into = i[into]
@@ -296,7 +307,7 @@ class Table(Vector):
       else : 
         d = dict()
         keys = x.keys()
-        if( len(keys) > 5 ) : 
+        if( len(keys) > limit ) : 
           sys.stderr.write("One hot would produce to many columns (limit set to %d). Exiting"%(limit))
           sys.exit(1)
         for k in x.keys() :

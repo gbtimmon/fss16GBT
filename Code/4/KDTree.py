@@ -93,7 +93,7 @@ class KDTree(o) :
       test = Reader( table ).table()
 
     t0 = clock()
-    rslt = [( x, i.nn( x )[0]) for x in test ]
+    rslt = [( x, i.set.getDependentValues(i.nn( x )[0])) for x in test ]
     t1 = clock()
 
     testObj = o()
@@ -118,5 +118,4 @@ if __name__ == '__main__' :
   t = KDTree( tab )
   r = t.test( test )
 
-  print( r ) 
   print( r.info() )

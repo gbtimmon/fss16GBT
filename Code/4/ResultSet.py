@@ -16,7 +16,7 @@ class ResultSet(o) :
     cur_val  = 1
     for i, tup in enumerate(results) :
       ex = tuple( self.test.set.getDependentValues( tup[0] ) )
-      pd = tuple( self.test.set.getDependentValues( tup[1] ) )
+      pd = tuple( tup[1] )
       rs = "1" if ex == pd else "0"
  
       for it in [ex, pd] :
@@ -68,8 +68,8 @@ class ResultSet(o) :
     ss += "\n    Prd T | %5d | %5d  " %(self.metric.TP, self.metric.FP) 
     ss += "\n    Prd F | %5d | %5d  " %(self.metric.FN, self.metric.TN) 
     ss += "\n"
-    ss += "\n    Metrics"
-    ss += "\n".join(["    %10s = %4.3f"%(str(k), float(v)) for k,v in self.metric.iteritems() if str(k) not in ["TP", "TN", "FP", "FN"]])   
+    ss += "\nMetrics\n"
+    ss += "\n".join(["    %-11s = %4.3f"%(str(k), float(v)) for k,v in self.metric.iteritems() if str(k) not in ["TP", "TN", "FP", "FN"]])   
     return ss
 
   def __str__( self ) : 

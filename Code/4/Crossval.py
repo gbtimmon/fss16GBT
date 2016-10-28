@@ -8,7 +8,7 @@ from Table      import Table, Reader
 from math       import floor
 from Stats      import rdivDemo
 
-tab            = Reader( sys.argv[1]).table().oneHot()
+tab            = Reader( sys.argv[1]).table().oneHot(limit=5)
 num_of_crosses = int( sys.argv[2] )
 increment      = int( len(tab) / num_of_crosses ) 
 
@@ -29,7 +29,7 @@ for i in xrange( num_of_crosses ) :
   test,train = tab.filter( table_range, shallowCopy=True )
  
   kdr = KDTree   ( train ).test(test)
-  mbr = MiniBatch( train, 100, 500,  20).test(test, 1)
+  mbr = MiniBatch( train, 50, 100, 100).test(test, 1)
 
   print( kdr.info() ) 
   print( mbr.info() ) 

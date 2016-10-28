@@ -29,6 +29,16 @@ class KNN(o) :
     i.size    = len( i.set )
     i.time = 0
 
+
+  def predict( i, k, row ) :
+ 
+    if k > 1 : 
+      sys.stderr.write("predict with k > 1 not implemented, exit")
+      exit(1)
+
+    tab = i.set
+    return tab.getDependentValues(tab.closest(row, n=k))
+
   def test(i, k, testSet ) :
 
     testObj   = o()
@@ -42,7 +52,7 @@ class KNN(o) :
     testObj.size = len( testObj.set )
 
     t0 = clock()
-    rslt = [ ( x, i.set.closest(x, n=testObj.k)) for x in testObj.set ]
+    rslt = [ ( x, i.predict(k, x) ) for x in testObj.set ]
     t1 = clock()
 
     testObj.time = t1 - t0
@@ -56,7 +66,7 @@ if __name__ == '__main__' :
     trn = Reader(sys.argv[2]).table().sample(100)
     tst = Reader(sys.argv[3]).table().sample(100)
   except : 
-    sys.stderr.write( cstr(" Illegal Arguments\n greater than", "r") )
+    sys.stderr.write( " Illegal Arguments\n greater than" )
     sys.stderr.write( __DOC__ )
     exit(1)
 

@@ -1,5 +1,6 @@
 from __future__   import division, print_function
 from Table        import Table, Reader
+from KNN          import KNN
 from O            import o 
 from math         import floor
 from time         import clock
@@ -52,25 +53,28 @@ class MiniBatch(o) :
     self.set = trainSet
     self.size = len(trainSet)
 
-        
     t0 = clock() #python on windows needs to use clock, 
                #since the system clock is different. 
                #clock on *nix seems to work fine, so clock seems to be
                # more portable in general. 
 
-    self._C = self.set.sample( k, shallowCopy=False )# 0. initial random centers
-    V = [0] * len(self._C)                         # 1. size of the current cluster
-    for i in xrange( t ) :                      # 2. for all iters
-      p = int(i/t * 50) + 1                     # _. show the percent complete. 
-      M = self.set.sample( b )                       # 3. random samples from data set  
-      D = [ self._C.closesti( k ) for k in M ]  # 4. closest center of each sample
-    
-      for x,c in zip(M,D) :                     # 5,6. for each sample and closest center
-        if isinstance( c, list) : c = c[0]      # if I got more than one center
-        c=c[0]
-        V[c] += 1                               # 7. grow the center
-        self._C.blendRow(c, x, 1/V[c] )         # 8,9. blend the center
 
+    C = self.set.sample( k, shallowCopy=False )                      # 0. initial random centers
+    R = [Table( [], header=self.set.header ) for _ in range(len(C))] # 1. Residents of the centroids
+    V = [0] * len(C)                                                 # 2. size of the current cluster
+    for i in xrange( t ) :                                           # 3. for all iters
+      M = self.set.sample( b, shallowCopy=True )                     # 4. random samples from data set  
+      D = [ C.closesti( z ) for z in M ]                             # 5. closest center of each sample
+      D = [ c[0][0] if isinstance(c, list) else c[0] for c in D ]    #    * unwrap D 
+      for x,c in zip(M,D) :                                          # 6. for each sample and closest center
+        V[c] += 1                                                    # 7. grow the center
+        C.blendRow(c, x, 1/V[c] )                                    # 8. blend the center
+        R[c](x)                                                      # 9. add the row to the centroid table
+
+    self._C = C
+    self._R = [ KNN(x) for x in R ]
+
+    print( *self._C, sep="\n")
     t1 = clock()
 
     self.time = t1 - t0
@@ -81,7 +85,8 @@ class MiniBatch(o) :
       testSet = Reader( testSet ).table()
 
     t0 = clock()
-    rslt = [ ( x, self._C.closest(x) ) for x in testSet ]
+    idxs = [ self._C.closesti(x)[0][0] for x in testSet ]
+    rslt = [(y, self._R[x].predict(1, y)) for x,y in zip( idxs, testSet )]
     t1 = clock() 
 
     testObj = o()
@@ -106,13 +111,12 @@ if __name__ == '__main__' :
     sys.stderr.write( __DOC__ )
     exit(1)
 
-  trn = Reader( trn ).table().sample(100)
-  tst = Reader( tst ).table().sample(100)
+  trn = Reader( trn ).table()
+  tst = Reader( tst ).table()
 
-  mt = MiniBatchKNN( trn, k, b, t )
+  mt = MiniBatch( trn, k, b, t )
   rs = mt.test( tst, knn )
 
-  print(rs)
   print(rs.info())
 
       
