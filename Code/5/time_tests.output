@@ -1,0 +1,8 @@
+    Niave Bayes with  250 rows -> Training Time :  -0.0045, Testing Time :  -0.0053 
+         KDTree with  250 rows -> Training Time :   0.0398, Testing Time :   0.0689 
+    Niave Bayes with  500 rows -> Training Time :  -0.0116, Testing Time :  -0.0133 
+         KDTree with  500 rows -> Training Time :   0.1245, Testing Time :   0.2255 
+    Niave Bayes with 1000 rows -> Training Time :  -0.0245, Testing Time :  -0.0262 
+         KDTree with 1000 rows -> Training Time :   0.2898, Testing Time :   0.5398 
+    Niave Bayes with 2000 rows -> Training Time :  -0.0470, Testing Time :  -0.0521 
+         KDTree with 2000 rows -> Training Time :   0.6142, Testing Time :   1.2398 

@@ -2,6 +2,7 @@ from __future__ import division
 from O import o
 from collections import defaultdict
 from Table import Table, Reader 
+from time import clock
 from math import log
 from ResultSet import ResultSet
 
@@ -15,6 +16,7 @@ class NB(o) :
     self._target   = {}
     self._eps      = 0.000000001
 
+    t0 = clock()
     for row in self.set : 
       dv = tuple(self.set.getDependentValues(row))
 
@@ -35,8 +37,10 @@ class NB(o) :
 
         self._chance[tup1] += 1
         self._chance[tup2] += 1
+
+    self.time = clock() - t0
  
-  def classify(self,  row ) : 
+  def predict(self,  row ) : 
     best   = -1000000000000000
     bestdv = None
    
@@ -56,13 +60,13 @@ class NB(o) :
 
   def test(self, test ) : 
 
-    
+    testObj = o()
     if not isinstance( test, Table ):
       test = Reader( test ).table()
 
-    rslt = [ (row, self.classify(row) ) for row in test ]
-
-    testObj = o()
+    t0 = clock()
+    rslt = [ (row, self.predict(row) ) for row in test ]
+    testObj.time = clock() - t0
     testObj.set  = test
     testObj.size = len( test ) 
     
