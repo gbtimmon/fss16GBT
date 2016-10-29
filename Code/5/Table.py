@@ -447,7 +447,7 @@ class Num:
     return i.max if x <(i.max-i.min)/2 else i.min
 
   def sd( i ):
-    return 0 if i.n <= 2 else (i.m2/(i.n - 1))**0.5
+    return 10e-50 if i.n <= 1 else (i.m2/(i.n - 1))**0.5
 
 """
     Sym Class
