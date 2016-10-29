@@ -54,76 +54,76 @@ This is data similar to the one above but only example of the 8 and 9 digit were
 
 ### KDTree output : 
 
-   Training :
-       set             : Table(12524)
-       time            : 0.134001417963
-       algorithm       : KDTree
-       size            : 692
+    Training :
+        set             : Table(12524)
+        time            : 0.134001417963
+        algorithm       : KDTree
+        size            : 692
    
-   Testing :
-       set             : Table(12522)
-       time            : 0.025937031721
-       size            : 76
+    Testing :
+        set             : Table(12522)
+        time            : 0.025937031721
+        size            : 76
    
-   Results Summary :
+    Results Summary :
    
-          ID |                     Value |  Exp Count |  Prd Count
-       ----- + ------------------------- + ---------- + ----------
-           1 |      ('tested_positive',) |         49 |         30
-           2 |      ('tested_negative',) |         27 |         46
+           ID |                     Value |  Exp Count |  Prd Count
+        ----- + ------------------------- + ---------- + ----------
+            1 |      ('tested_positive',) |         49 |         30
+            2 |      ('tested_negative',) |         27 |         46
+    
+        Confusion Matrix
+                *Using Minority Class as Positive: ('tested_negative',)
    
-       Confusion Matrix
-               *Using Minority Class as Positive: ('tested_negative',)
+              | Exp T | Exp F
+        ----- + ----- + -----
+        Prd T |    18 |    28
+        Prd F |     9 |    21
    
-             | Exp T | Exp F
-       ----- + ----- + -----
-       Prd T |    18 |    28
-       Prd F |     9 |    21
-   
-   Metrics
-       f1          = 0.493
-       recall      = 0.667
-       falsealarm  = 0.571
-       precision   = 0.391
-       specificity = 0.429
-       accuracy    = 0.513
+    Metrics
+        f1          = 0.493
+        recall      = 0.667
+        falsealarm  = 0.571
+        precision   = 0.391
+        specificity = 0.429
+        accuracy    = 0.513
 
 ### Niave Bayes Output :
 
-   Training :
-       set             : Table(12523)
-       algorithm       : Niave Bayes
-       time            : 0.0266010108905
-       pdf             : gauss
-       size            : 692
-   
-   Testing :
-       size            : 76
-       set             : Table(12522)
-       time            : 0.00269815554324
-   
-   Results Summary :
-   
-          ID |                     Value |  Exp Count |  Prd Count
-       ----- + ------------------------- + ---------- + ----------
-           1 |      ('tested_positive',) |         49 |         48
-           2 |      ('tested_negative',) |         27 |         28
-   
-       Confusion Matrix
-               *Using Minority Class as Positive: ('tested_negative',)
-   
-             | Exp T | Exp F
-       ----- + ----- + -----
-       Prd T |    18 |    10
-       Prd F |     9 |    39
-   
-   Metrics
-       f1          = 0.655
-       recall      = 0.667
-       falsealarm  = 0.204
-       precision   = 0.643
-       specificity = 0.796
-       accuracy    = 0.750
+    Training :
+        set             : Table(12523)
+        algorithm       : Niave Bayes
+        time            : 0.0266010108905
+        pdf             : gauss
+        size            : 692
+    
+    Testing :
+        size            : 76
+        set             : Table(12522)
+        time            : 0.00269815554324
+    
+    Results Summary :
+    
+           ID |                     Value |  Exp Count |  Prd Count
+        ----- + ------------------------- + ---------- + ----------
+            1 |      ('tested_positive',) |         49 |         48
+            2 |      ('tested_negative',) |         27 |         28
+    
+        Confusion Matrix
+                *Using Minority Class as Positive: ('tested_negative',)
+    
+              | Exp T | Exp F
+        ----- + ----- + -----
+        Prd T |    18 |    10
+        Prd F |     9 |    39
+    
+    Metrics
+        f1          = 0.655
+        recall      = 0.667
+        falsealarm  = 0.204
+        precision   = 0.643
+        specificity = 0.796
+        accuracy    = 0.750
    
 
 ## Performance (diabetes deduped ) : 
