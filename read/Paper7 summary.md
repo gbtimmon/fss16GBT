@@ -33,6 +33,6 @@ Based on an analysis of rules learned from neighboring clusters in different sou
 ## Conclusion
 The results of the paper strongly endorse the creation of the local lessons team. However, that team should apply automatic algorithms to build clusters from all available data. It concludes that basic global rules are not sufficient for such complex entities, and neither is it sufficient to characterize the data into local contexts. Future work includes improving the WHICH and WHERE, as well as exploring multi-goal optimization.
 
-
+Note: We've asked professor Menzies for permission to review his paper.
 
 
