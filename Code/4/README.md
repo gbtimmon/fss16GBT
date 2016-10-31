@@ -1,18 +1,9 @@
-# Niave Bayes analysis
-
-For this project I compared my KDTree implementation from last week with a new Niave Bayes Classifier 
-
-## Questions  
-
-* The Naive bayes (with roughlt n training time in my implementation, trians faster than the KDTree which has roughly O(n log n ) training time 
-* like wise Niave bayes out performs on training times.
-* in addition the Niave bayes outperformed KDTree on all three datasets - meaning that faster does not equal worse here. 
-
 ## Code 
 
- * [Niave Bayes](https://github.com/gbtimmon/fss16_teamf/tree/master/Code/5/NB.py)
- * [KDTree](https://github.com/gbtimmon/fss16_teamf/tree/master/Code/5/KDTree.py)
- * [Table](https://github.com/gbtimmon/fss16_teamf/tree/master/Code/5/Table.py)
+ * [MiniBatch](https://github.com/gbtimmon/fss16_teamf/tree/master/Code/4/MiniBatch.py)
+ * [KNN](https://github.com/gbtimmon/fss16_teamf/tree/master/Code/4/KNNqewwwwwwwwwwwww.py)
+ * [KDTree](https://github.com/gbtimmon/fss16_teamf/tree/master/Code/4/KDTree.py)
+ * [Table](https://github.com/gbtimmon/fss16_teamf/tree/master/Code/4/Table.py)
 
 ## Datasets 
 
