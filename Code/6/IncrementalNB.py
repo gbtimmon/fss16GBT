@@ -58,6 +58,15 @@ class IncrementalNB(o) :
     self._subtable[dv]( nrow )
     self.set( nrow ) 
  
+  def test( self, data ) : 
+    testObj = o()
+    t0 = clock()
+    rslt = [ (x, self.predict(x)[0]) for x in data]
+    testObj.time = clock() - t0
+    testObj.size = len(data)
+    testObj.set  = data
+    return ResultSet( self, testObj, rslt )
+
   def predict(self,  row, train=False ) : 
     best   = -1000000000000000
     bestdv = None

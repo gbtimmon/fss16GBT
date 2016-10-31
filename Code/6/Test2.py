@@ -5,6 +5,12 @@ from Anomaly import NBAnomalyDetector
 from IncrementalNB import IncrementalNB
 import sys
 
+def median(lst):
+    quotient, remainder = divmod(len(lst), 2)
+    if remainder:
+        return sorted(lst)[quotient]
+    return sum(sorted(lst)[quotient - 1:quotient + 1]) / 2
+
 tab = Reader( sys.argv[1] ).table()
 gen = Generator( tab ) 
 gen.setProb( (50,50) )
@@ -30,6 +36,17 @@ for e in era :
       if( r.expected == k ) : bot+=1
     recall.append(top/bot)
   print("Era %2d : Recall = %3.2f, Probability = ( %2d, %2d, %2d )"%(idx, sum(recall)/len(recall),e[0],e[1],e[2]))
+
+  from collections import defaultdict
+  mp = defaultdict(list)
+  for d in dat : 
+    ret = inb.predict( d )
+    mp[ret[0][0]].append( ret[1] )
+
+  for k,v in mp.iteritems() : 
+    print("    %10s median log-likelihood is %3.2f"%(k,median(v)))
+
+  
   idx+=1
   inb.train( dat ) 
   
