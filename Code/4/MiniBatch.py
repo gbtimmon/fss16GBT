@@ -71,14 +71,17 @@ class MiniBatch(o) :
         C.blendRow(c, x, 1/V[c] )                                    # 8. blend the center
         R[c](x)                                                      # 9. add the row to the centroid table
 
-    self._C = C
-    self._R = [ KNN(x) for x in R ]
+    self._C,_ = C.filter( lambda idx, row : V[idx] > 0 ) 
+ 
+    print( self._C )
+    print( V )
+    self._R = [ KNN(R[i]) for i in xrange( len( V ) ) if V[i] > 0 ]
 
-    print( *self._C, sep="\n")
     t1 = clock()
 
     self.time = t1 - t0
 
+  
   def test(self, testSet, k ):
     
     if not isinstance( testSet, Table ) :

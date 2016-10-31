@@ -21,6 +21,7 @@ KNN
 )
 
 class KNN(o) :
+
   def __init__( i, trainSet ) : 
     super( KNN, i).__init__()
 

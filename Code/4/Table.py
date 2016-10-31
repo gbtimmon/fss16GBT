@@ -228,10 +228,17 @@ class Table(Vector):
     return arr[:n]
   
   def closest( i, x, n=1 ) :
-    if n == 1 :
-      return i[ i.closesti(x, n=n)[0][0] ]
-    else :
-      return [ i[x[0][0]] for x in i.closesti(x,n=n) ]
+
+    closest = i.closesti(x, n=n)
+
+    try :
+      if n == 1 :
+        return i[ i.closesti(x, n=n)[0][0] ]
+      else :
+        return [ i[x[0][0]] for x in i.closesti(x,n=n) ]
+    except : 
+      print ( closest )
+      exit(1)
     
   def knn(i, row, n=1 ) :
     nn = map( tuple, i.closest( row, n=n ).getDependent() ) 
