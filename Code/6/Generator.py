@@ -50,6 +50,9 @@ class Generator(o) :
     while True:
       yield self.getOneRow()
 
+  def getTable( self, k ) : 
+    return Table( self.getRows(k), header=self.table.header, shallowCopy=True )
+
   def getRows(self, k ):
     for _ in xrange(k) :
       yield self.getOneRow()
