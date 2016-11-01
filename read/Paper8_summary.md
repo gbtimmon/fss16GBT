@@ -9,14 +9,14 @@ Why do these discrepancies exist in results of newer methods?
 - In addition, naively applying a linear regression model is often inappropriate due to the non-normality of the residuals and without considering transformations to the response and/or explanatory variables. 
 
 ## Baseline models
-Characteristics: 
-(1) be simple to describe, implement, and interpret;
-(2) be deterministic in its outcomes;
-(3) be applicable to mixed qualitative and quantitative data;
-(4) offer some explanatory information regarding the prediction by representing generalised properties of the underlying data;
-(5) have no parameters within the modelling process that require tuning;
-(6) be publically available via a reference implementation and associated environment for execution; and
-(7) generally be more accurate than a random guess or an estimate based purely on the distribution of the response variable.
+Characteristics:  
+1. be simple to describe, implement, and interpret  
+2. be deterministic in its outcomes  
+3. be applicable to mixed qualitative and quantitative data  
+4. offer some explanatory information regarding the prediction by representing generalised properties of the underlying data  
+5. have no parameters within the modelling process that require tuning  
+6. be publically available via a reference implementation and associated environment for execution  
+7. generally be more accurate than a random guess or an estimate based purely on the distribution of the response variable.  
 
 The ongoing use of a baseline model in the literature would give a single point of comparison, allowing a meaningful assessment of any new method against previous work. number of possibilities for models exist: a linear regression model, a simple decision tree, generalised linear models, extensions to linear and tree-based modelling etc. Their baseline model is presented as an implementation in the R programming environment,since R is a free, open-source environment with a standard core MLR implementation. The standard accuracy measure for this model used is RE, where RE∗ greater than 1 would be considered poor, independent of the dataset. 
 
