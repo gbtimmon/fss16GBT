@@ -1,4 +1,4 @@
-samples:
+Samples:
 
 WINE
   
@@ -16,10 +16,12 @@ IRIS
 
 
 Error rates: [ 0.98039216  0.96078431  0.97916667]
+  
 MNIST
 
 
 Error rates: [ 0.50406711  0.50419527  0.50419527]
+  
 SEE:
   
 NASA
