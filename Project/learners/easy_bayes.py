@@ -9,7 +9,7 @@ from sklearn.naive_bayes import GaussianNB
 
 
 if __name__ == '__main__' : 
-  data, meta = arff.loadarff( open( sys.argv[1] ) ) 
+  data, meta = arff.loadarff( open( 'nasa93.arff' ) ) 
   data = np.array([ list(x) for x in data ], dtype=(np.str_) )
   print( meta ) 
   iv =  data[:, [ 5,6,7,8,11,12,13,14,15,17,18,19,20,22]] 
@@ -18,5 +18,4 @@ if __name__ == '__main__' :
   gnb = GaussianNB()
   y_pred = gnb.fit( iv, dv ).predict( iv ) 
 
-  print( y_pred ) 
-
+  print( y_pred )
