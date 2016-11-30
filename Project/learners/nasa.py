@@ -5,7 +5,7 @@ import numpy as np
 from sklearn import svm
 from sklearn import preprocessing
 from sklearn.linear_model import *
-
+from basic_cocomo import *
 
 dataset= arff.load(open('nasa93.arff'))
 data = np.array(dataset['data'])
@@ -36,5 +36,10 @@ for method in methods:
     print "Fitting..."
     searchCV.fit(xtrain, ytrain)
     print str(searchCV.predict(xtrain[0]))
-print xtrain[0]
+#print xtrain[0]
 #print ytrain[0]
+
+l=len(xtrain[0])
+for i in range(len(xtrain)):
+	print str(cocomo_person(0, float(xtrain[i][l-1])))+"person months compared to:"
+	print ytrain[i]

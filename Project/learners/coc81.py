@@ -5,6 +5,7 @@ import numpy as np
 from sklearn import svm
 from sklearn import preprocessing
 from sklearn.linear_model import *
+from basic_cocomo import *
 
 
 dataset= arff.load(open('coc81.arff'))
@@ -32,3 +33,7 @@ for method in methods:
 print
 #print xtrain[0]
 print ytrain[0]
+l=len(xtrain[0])
+for i in range(len(xtrain)):
+	print str(cocomo_months(xtrain[i][0],float(xtrain[i][l-1])))+ " months in cocomo"
+

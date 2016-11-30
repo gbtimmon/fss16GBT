@@ -4,6 +4,7 @@ import sys
 import numpy as np
 from sklearn import svm
 from sklearn import preprocessing
+from basic_cocomo import *
 from sklearn.linear_model import *
 
 
@@ -37,4 +38,8 @@ for method in methods:
     searchCV.fit(xtrain, ytrain)
     print str(searchCV.predict(xtrain[1]))
 #print xtrain[1]
-print ytrain[1]
+#print ytrain[1]
+l=len(xtrain[0])
+for i in range(len(xtrain)):
+	print str(cocomo_months(0,float(xtrain[i][l-1])/1000.0))+" months compared to:"
+	print ytrain[i]
