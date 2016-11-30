@@ -10,9 +10,9 @@ from basic_cocomo import *
 from Table        import Table, Reader 
 from models_regression import *
 
-table="../data/nasa93.arff"
+table="../data/wine.csv"
 
-t = Reader( table, ignoreCols=(0,25,26), sep="," ).table()
+t = Reader( table, sep="," ).table()
 data = np.array( t.data ) 
 
 
@@ -22,21 +22,9 @@ data = np.array( t.data )
 #print data[0]
 xtrain,ytrain=[],[]
 for i in range(len(data)):
-	xtrain.append(data[i][0:23])
-	ytrain.append([data[i][23]])#, data[i][len(data[0])-1]])
-	for j in range(23):
-		if(xtrain[i][j]=='vl'):
-			xtrain[i][j]=0.0
-		elif(xtrain[i][j]=='l'):
-			xtrain[i][j]=1.0
-		elif(xtrain[i][j]=='n'):
-			xtrain[i][j]=2.0
-		elif(xtrain[i][j]=='h'):
-			xtrain[i][j]=3.0
-		elif(xtrain[i][j]=='vh'):
-			xtrain[i][j]=4.0
-		elif(xtrain[i][j]=='xh'):
-			xtrain[i][j]=5.0
+	xtrain.append(data[i][0:13])
+	ytrain.append([data[i][13]])#, data[i][len(data[0])-1]])
+
 print
 xtrain=np.array(xtrain).astype(float)
 ytrain=np.array(ytrain).astype(float)
