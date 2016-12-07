@@ -47,17 +47,18 @@ class Vector(object) :
   def __copy__( i )          : return i.__class__(i) 
   def copy( i )              : return i.__copy__()
 
-def Reader( filename, ignoreCols=None, sep="," ) : 
+def Reader( filename, ignoreCols=None, sep=",", noHeader=False ) : 
   if( filename.lower().endswith("csv") ) : 
-    return CSVReader( filename, ignoreCols=ignoreCols, sep=sep ) 
+    return CSVReader( filename, ignoreCols=ignoreCols, sep=sep, noHeader=noHeader ) 
   elif( filename.lower().endswith("arff") ) : 
-    return ARFFReader( filename, ignoreCols=ignoreCols, sep=sep )
+    return ARFFReader( filename, ignoreCols=ignoreCols, sep=sep, noHeader=noHeader )
   raise ValueError( "Invalid Filetype" )
     
 class ARFFReader( ) :
   
-  def __init__( i, filename, ignoreCols=None, sep="," ) :
+  def __init__( i, filename, ignoreCols=None, sep=",", noHeader=False ) :
 
+    i.noHeader   = noHeader
     i.filename   = filename
     i.sep        = sep
     i.attr       = [] 
@@ -92,12 +93,13 @@ class ARFFReader( ) :
     return str(inv)
 
   def table( i ) :
-    return Table( i, header=i.attr ) 
+    return Table( i, header=i.attr, noHeader=i.noHeader ) 
 
 class CSVReader( ) : 
 
-  def __init__ ( i, filename, ignoreCols=None, sep="," ) : 
-    
+  def __init__ ( i, filename, ignoreCols=None, sep=",", noHeader=False ) : 
+
+    i.noHeader   = noHeader   
     i.filename   = filename
     i.ignoreCols = ignoreCols if ignoreCols is not None else tuple() 
     i.sep        = sep
@@ -127,7 +129,7 @@ class CSVReader( ) :
     return str(inv)
     
   def table( i ) : 
-    return Table( i )
+    return Table( i, noHeader=i.noHeader )
 
 class Row( Vector ):
   """
@@ -291,7 +293,7 @@ class Table(Vector):
     if n > len(i):
       return i.copy( shallowCopy=shallowCopy ) 
     else :
-      return Table( random.sample(i, n), header=i.colNames(), shallowCopy=shallowCopy )
+      return Table( random.sample(i.data, n), header=i.colNames(), shallowCopy=shallowCopy )
 
   def blendRow(i, into, frm, rate ) :
     if isinstance( into, int ) : into = i[into]
@@ -393,9 +395,9 @@ class _Header():
       name = name.name #lol
 
     i.pos  = pos
-    i.dep  = True if( name[0] == "=" ) else False
+    i.dep  = True if( str(name)[0] == "=" ) else False
     i.stat = None
-    i.name = name.strip()
+    i.name = str(name).strip()
 
   def add( i, x ) : 
     Num()

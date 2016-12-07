@@ -16,8 +16,8 @@ def cocomo_months(type, kloc):
 	elif(type==3):
 		a,b,c,d=2.4,1.05,2.5,0.38
 	effort=a*(kloc**b)
-	print str(effort) + " person months"
-	print str(c*(effort**d))+" months"
+	print ( str(effort) + " person months" ) 
+	print ( str(c*(effort**d))+" months" ) 
 
 def cocomo_person(type, kloc):
 	a,b,c,d=3.6,1.2,2.5,0.32
@@ -26,4 +26,4 @@ def cocomo_person(type, kloc):
 	elif(type==3):
 		a,b,c,d=2.4,1.05,2.5,0.38
 	effort=a*(kloc**b)
-	print str(effort) + " person months"
+	print ( str(effort) + " person months" ) 

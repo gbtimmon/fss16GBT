@@ -1,11 +1,11 @@
-import arff, numpy as np
+import numpy as np
 import csv
 import sys
 import numpy as np
 from sklearn import svm
 from sklearn import preprocessing
 from sklearn.linear_model import *
-from sklearn.model_selection import cross_val_score
+from sklearn.cross_validation import cross_val_score
 from basic_cocomo import *
 from Table        import Table, Reader 
 from models_classify import *

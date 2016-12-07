@@ -51,13 +51,14 @@ def intrinsic_dimension(X:np.ndarray, k1:int=6, k2:int=12,
     S = np.cumsum(knnmatrix, 1)
     indexk = np.arange(k1, k2+1) # broadcasted afterwards
     dhat = -(indexk - 2) / (S[:, k1-1:k2] - knnmatrix[:, k1-1:k2] * indexk)
-       
+
     if estimator == 'levina':  
         # Average over estimates and over values of k
+        no_dims = dhat.mean()
+    if estimator == 'mackay':
         # Average over inverses
         dhat **= -1
         dhat_k = dhat.mean(0)
         no_dims = (dhat_k ** -1).mean()
-           
     return no_dims
     
