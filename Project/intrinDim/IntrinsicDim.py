@@ -3,9 +3,9 @@
 import sys
 import numpy as np
 
-def intrinsic_dimension(X:np.ndarray, k1:int=6, k2:int=12, 
-                        estimator:str='levina', metric:str='vector', 
-                        trafo:str='var', mem_threshold:int=5000):
+def intrinsic_dimension(X, k1=6, k2=12, 
+                        estimator='levina', metric='vector', 
+                        trafo='var', mem_threshold=5000):
 
     n = X.shape[0]
     if estimator not in ['levina', 'mackay']:

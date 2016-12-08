@@ -156,7 +156,7 @@ class Table(Vector):
     i.rowCount = 0 
     i.id       = Table.idGen = Table.idGen + 1 
     if header is None and not noHeader : 
-      i.header = Header( stream.__iter__().__next__() )
+      i.header = Header( stream.__iter__().next() )
     elif not noHeader : 
       i.header = Header( header )
     else :

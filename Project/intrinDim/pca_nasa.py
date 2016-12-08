@@ -2,15 +2,13 @@
 import sys
 import numpy as np
 
-from IntrinsicDim import * 
-from inDim        import * 
+from pca          import *
 from collections  import defaultdict
 from scipy.io     import arff
 from Table        import Table, Reader 
 
 table="../data/nasa93.arff"
 
-k = int( sys.argv[1] ) 
 t = Reader( table, ignoreCols=(0,23,24,25,26), sep="," ).table()
 
 for r, row in enumerate( t.data ) : 
@@ -21,8 +19,9 @@ for r, row in enumerate( t.data ) :
     if( col == 'h' ) : t.data[r][c] = 3
     if( col == 'vh' ) : t.data[r][c] = 4
     if( col == 'xh' ) : t.data[r][c] = 5
-
-a = med_id( t, k, k*2 ) 
+pca( t, 0.025 ) 
+pca( t, 0.015 ) 
+a = pca( t, 0.005, plot=True ) 
 
 t = Reader( table, ignoreCols=(0,23,25,26), sep="," ).table()
 
@@ -35,9 +34,10 @@ for r, row in enumerate( t.data ) :
     if( col == 'vh' ) : t.data[r][c] = 4
     if( col == 'xh' ) : t.data[r][c] = 5
 
+pca( t, 0.025 ) 
+pca( t, 0.015 ) 
+b = pca( t, 0.005, plot = True ) 
 
-b = med_id( t, k, k*2 ) 
-
-print( list( zip( a, b ) ) ) 
+print( sum( [ x - y for x, y in zip(a,b)] ) ) 
 
 
