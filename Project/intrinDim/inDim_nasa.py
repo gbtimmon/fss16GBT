@@ -38,6 +38,6 @@ for r, row in enumerate( t.data ) :
 
 b = med_id( t, k, k*2 ) 
 
-print( list( zip( a, b ) ) ) 
+print(  a, b ) 
 
 

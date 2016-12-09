@@ -41,5 +41,5 @@ for r, row in enumerate( t2.data ) :
 a = med_id( t, k, 2*k )
 b = med_id( t2, k, 2*k ) 
 
-print( list(zip(a,b) )  ) 
+print( a , b ) 
 

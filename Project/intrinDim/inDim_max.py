@@ -18,7 +18,7 @@ a = med_id( t, k, k*2 )
 t = Reader( table, ignoreCols=(0,), sep="," ).table()
 b = med_id(t, k, k* 2) 
 
-print( list( zip( a,b ) ) ) 
+print( a,b ) 
 
 
 

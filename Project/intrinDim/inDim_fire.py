@@ -15,7 +15,7 @@ t = Reader( table, ignoreCols=(2,3,12), sep="," ).table()
 a = med_id(t, k , 2*k)
 t = Reader( table, ignoreCols=(2,3), sep="," ).table()
 b = med_id(t, k, 2*k)
-print( list(zip(a,b)))
+print( a,b )
 
 
 

@@ -21,7 +21,7 @@ t = t.oneHot()
 b = med_id( t, k , k*2  ) 
 
 
-print( list( zip( a, b) ) ) 
+print( a, b ) 
 
 
 

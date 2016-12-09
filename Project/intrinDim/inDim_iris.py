@@ -20,7 +20,7 @@ a = med_id(t,k,2*k)
 t = Reader( table, ignoreCols=tuple(), sep="," ).table().oneHot()
 b= med_id(t,k,2*k) 
 
-print( list( zip( a, b) ) ) 
+print( a, b ) 
 
 
 
